@@ -3,19 +3,17 @@ Parallel data loading functions
 '''
 import sys
 import time
-
-import numpy as np
 import traceback
+import numpy as np
 from PIL import Image
 from six.moves import queue
 from multiprocessing import Process, Event
 
-from lib.config import cfg
-from lib.data_augmentation import preprocess_img
-from lib.data_io import get_voxel_file, get_rendering_file
-from lib.binvox_rw import read_as_3d_array
+from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
+from pytorch_3d_r2n2.lib.data_io import get_voxel_file, get_rendering_file
+from pytorch_3d_r2n2.lib.binvox_rw import read_as_3d_array
 
-import torch
+from pytorch_3d_r2n2.Config.config import cfg
 
 
 def print_error(func):
@@ -63,7 +61,8 @@ class DataProcess(Process):
         if (self.cur + self.batch_size) >= self.num_data and self.repeat:
             self.shuffle_db_inds()
 
-        db_inds = self.perm[self.cur:min(self.cur + self.batch_size, self.num_data)]
+        db_inds = self.perm[self.cur:min(self.cur +
+                                         self.batch_size, self.num_data)]
         self.cur += self.batch_size
         return db_inds
 
@@ -103,13 +102,18 @@ class DataProcess(Process):
 
 class ReconstructionDataProcess(DataProcess):
 
-    def __init__(self, data_queue, category_model_pair, background_imgs=[], repeat=True,
+    def __init__(self,
+                 data_queue,
+                 category_model_pair,
+                 background_imgs=[],
+                 repeat=True,
                  train=True):
         self.repeat = repeat
         self.train = train
         self.background_imgs = background_imgs
-        super(ReconstructionDataProcess, self).__init__(
-            data_queue, category_model_pair, repeat=repeat)
+        super(ReconstructionDataProcess, self).__init__(data_queue,
+                                                        category_model_pair,
+                                                        repeat=repeat)
 
     @print_error
     def run(self):
@@ -132,20 +136,22 @@ class ReconstructionDataProcess(DataProcess):
                 curr_n_views = n_views
 
             # This will be fed into the queue. create new batch everytime
-            batch_img = np.zeros((curr_n_views, self.batch_size, 3, img_h, img_w))
+            batch_img = np.zeros(
+                (curr_n_views, self.batch_size, 3, img_h, img_w))
             batch_voxel = np.zeros((self.batch_size, 2, n_vox, n_vox, n_vox))
-
 
             # load each data instance
             for batch_id, db_ind in enumerate(db_inds):
                 category, model_id = self.data_paths[db_ind]
-                image_ids = np.random.choice(cfg.TRAIN.NUM_RENDERING, curr_n_views)
+                image_ids = np.random.choice(cfg.TRAIN.NUM_RENDERING,
+                                             curr_n_views)
 
                 # load multi view images
                 for view_id, image_id in enumerate(image_ids):
                     im = self.load_img(category, model_id, image_id)
                     # channel, height, width
-                    batch_img[view_id, batch_id, :, :, :] = im.transpose((2, 0, 1))
+                    batch_img[view_id, batch_id, :, :, :] = im.transpose(
+                        (2, 0, 1))
 
                 voxel = self.load_label(category, model_id)
                 voxel_data = voxel.data
@@ -188,13 +194,20 @@ def kill_processes(queue, processes):
         p.terminate()
 
 
-def make_data_processes(queue, data_paths, num_workers, repeat=True, train=True):
+def make_data_processes(queue,
+                        data_paths,
+                        num_workers,
+                        repeat=True,
+                        train=True):
     '''
     Make a set of data processes for parallel data loading.
     '''
     processes = []
     for i in range(num_workers):
-        process = ReconstructionDataProcess(queue, data_paths, repeat=repeat, train=train)
+        process = ReconstructionDataProcess(queue,
+                                            data_paths,
+                                            repeat=repeat,
+                                            train=train)
         process.start()
         processes.append(process)
     return processes
@@ -215,8 +228,8 @@ def get_while_running(data_process, data_queue, sleep_time=0):
 
 def test_process():
     from multiprocessing import Queue
-    from lib.config import cfg
-    from lib.data_io import category_model_id_pair
+    from pytorch_3d_r2n2.lib.data_io import category_model_id_pair
+    from pytorch_3d_r2n2.Config.config import cfg
 
     cfg.TRAIN.PAD_X = 10
     cfg.TRAIN.PAD_Y = 10

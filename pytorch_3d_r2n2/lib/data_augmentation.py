@@ -4,7 +4,7 @@
 import numpy as np
 from PIL import Image
 
-from pytorch_3d_r2n2.lib.config import cfg
+from pytorch_3d_r2n2.Config.config import cfg
 
 def image_transform(img, crop_x, crop_y, crop_loc=None, color_tint=None):
     """

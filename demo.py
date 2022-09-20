@@ -9,7 +9,7 @@ import torch
 from PIL import Image
 
 from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
-from pytorch_3d_r2n2.lib.config import cfg, cfg_from_list
+from pytorch_3d_r2n2.Config.config import cfg, cfg_from_list
 from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
 from pytorch_3d_r2n2.lib.solver import Solver
 from pytorch_3d_r2n2.lib.voxel import voxel2obj

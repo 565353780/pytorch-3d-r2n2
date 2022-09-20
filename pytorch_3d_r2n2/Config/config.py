@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from easydict import EasyDict as edict
 
 __C = edict()
@@ -8,7 +11,6 @@ cfg = __C
 #
 # Common
 #
-__C.SUB_CONFIG_FILE = []
 __C.DATASET = './experiments/dataset/shapenet_1000.json'  # yaml/json file that specifies a dataset (training/testing)
 __C.NET_NAME = 'res_gru_net'
 __C.PROFILE = False
@@ -115,8 +117,9 @@ def _merge_a_into_b(a, b):
 
         # the types must match, too
         if type(b[k]) is not type(v):
-            raise ValueError(('Type mismatch ({} vs. {}) '
-                              'for config key: {}').format(type(b[k]), type(v), k))
+            raise ValueError(
+                ('Type mismatch ({} vs. {}) '
+                 'for config key: {}').format(type(b[k]), type(v), k))
 
         # recursively merge dicts
         if type(v) is edict:

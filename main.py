@@ -7,9 +7,10 @@ import logging
 import numpy as np
 import multiprocessing as mp
 
-from lib.config import cfg, cfg_from_file, cfg_from_list
-from lib.test_net import test_net
-from lib.train_net import train_net
+from pytorch_3d_r2n2.Config.config import cfg, cfg_from_file, cfg_from_list
+
+from pytorch_3d_r2n2.lib.test_net import test_net
+from pytorch_3d_r2n2.lib.train_net import train_net
 
 
 def parse_args():

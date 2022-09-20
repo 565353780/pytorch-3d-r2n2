@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import inspect
-from multiprocessing import Queue
 from torch.utils.data import DataLoader
 
-from models import load_model
-from lib.config import cfg
-from lib.dataset import ShapeNetDataset, ShapeNetCollateFn
-from lib.solver import Solver
-from lib.data_process import kill_processes
+from pytorch_3d_r2n2.lib.solver import Solver
+from pytorch_3d_r2n2.lib.dataset import ShapeNetDataset, ShapeNetCollateFn
+#  from pytorch_3d_r2n2.lib.data_process import kill_processes
+
+from pytorch_3d_r2n2.Config.config import cfg
+
+from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
 
 
 def cleanup_handle(func):
@@ -29,25 +29,13 @@ def cleanup_handle(func):
 
 @cleanup_handle
 def train_net():
-    '''Main training function'''
-    # Set up the model and the solver
-    NetClass = load_model(cfg.CONST.NETWORK_CLASS)
-
-    net = NetClass()
+    net = ResidualGRUNet()
     print('\nNetwork definition: ')
     print(net)
 
-    # Check that single view reconstruction net is not used for multi view
-    # reconstruction.
     if net.is_x_tensor4 and cfg.CONST.N_VIEWS > 1:
         raise ValueError('Do not set the config.CONST.N_VIEWS > 1 when using' \
                          'single-view reconstruction network')
-
-    # Prefetching data processes
-    #
-    # Create worker and data queue for data processing. For training data, use
-    # multiple processes to speed up the loading. For validation data, use 1
-    # since the queue will be popped every TRAIN.NUM_VALIDATION_ITERATIONS.
 
     train_dataset = ShapeNetDataset(cfg.TRAIN.DATASET_PORTION)
     train_collate_fn = ShapeNetCollateFn()

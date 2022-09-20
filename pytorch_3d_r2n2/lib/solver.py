@@ -7,7 +7,7 @@ import torch
 from datetime import datetime
 from torch.optim import SGD, Adam, lr_scheduler
 
-from pytorch_3d_r2n2.lib.config import cfg
+from pytorch_3d_r2n2.Config.config import cfg
 from pytorch_3d_r2n2.lib.utils import Timer, has_nan
 
 

@@ -5,15 +5,17 @@ import numpy as np
 import datetime as dt
 import torch.nn as nn
 
-from pytorch_3d_r2n2.lib.config import cfg
+from pytorch_3d_r2n2.Config.config import cfg
+
 from pytorch_3d_r2n2.lib.utils import weight_init
 
 
 class Net(nn.Module):
 
-    def __init__(self,
-                 random_seed=dt.datetime.now().microsecond,
-                 compute_grad=True):
+    def __init__(
+        self,
+        random_seed=dt.datetime.now().microsecond,
+    ):
         print("initializing \"Net\"")
         super(Net, self).__init__()
         self.rng = np.random.RandomState(random_seed)

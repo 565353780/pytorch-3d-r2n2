@@ -1,14 +1,14 @@
 
+import torch
 import numpy as np
 from PIL import Image
-import torch
 from torch.utils.data import Dataset
 
-from lib.binvox_rw import read_as_3d_array
-from lib.config import cfg
-from lib.data_augmentation import preprocess_img
-from lib.data_io import category_model_id_pair, get_voxel_file, get_rendering_file
+from pytorch_3d_r2n2.lib.binvox_rw import read_as_3d_array
+from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
+from pytorch_3d_r2n2.lib.data_io import category_model_id_pair, get_voxel_file, get_rendering_file
 
+from pytorch_3d_r2n2.Config.config import cfg
 
 class ShapeNetDataset(Dataset):
     def __init__(self, dataset_portion=[]):
