@@ -1,13 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
 import sys
-from datetime import datetime
-
-from lib.config import cfg
-from lib.utils import Timer, has_nan
-
 import torch
+from datetime import datetime
 from torch.optim import SGD, Adam, lr_scheduler
-from torch.autograd import Variable
+
+from pytorch_3d_r2n2.lib.config import cfg
+from pytorch_3d_r2n2.lib.utils import Timer, has_nan
 
 
 def max_or_nan(params):
@@ -15,7 +16,7 @@ def max_or_nan(params):
     nan_or_max_param = torch.FloatTensor(len(params)).zero_()
     if torch.cuda.is_available():
         nan_or_max_param = nan_or_max_param.cuda()
-        
+
     for param_idx, param in enumerate(params):
         # If there is nan, max will return nan
         # Note that param is Variable
@@ -30,7 +31,7 @@ class Solver(object):
         self.net = net
         self.lr = cfg.TRAIN.DEFAULT_LEARNING_RATE
         print('Set the learning rate to %f.' % self.lr)
-        
+
         #set the optimizer
         self.set_optimizer(cfg.TRAIN.POLICY)
 
@@ -43,9 +44,14 @@ class Solver(object):
         w_decay = cfg.TRAIN.WEIGHT_DECAY
         if policy == 'sgd':
             momentum = cfg.TRAIN.MOMENTUM
-            self.optimizer = SGD(net.parameters(), lr=lr, weight_decay=w_decay, momentum=momentum)
+            self.optimizer = SGD(net.parameters(),
+                                 lr=lr,
+                                 weight_decay=w_decay,
+                                 momentum=momentum)
         elif policy == 'adam':
-            self.optimizer = Adam(net.parameters(), lr=lr, weight_decay=w_decay)
+            self.optimizer = Adam(net.parameters(),
+                                  lr=lr,
+                                  weight_decay=w_decay)
         else:
             sys.exit('Error: Unimplemented optimization policy')
 
@@ -57,18 +63,18 @@ class Solver(object):
             x (torch.Tensor): batch_img_tensor
             y (torch.Tensor): batch_voxel_tensor
         """
-        
+
         if torch.cuda.is_available():
             x = x.cuda()
             y = y.cuda()
-            
+
         loss = self.net(x, y, test=False)
-        
+
         #compute gradient and do parameter update step
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        
+
         return loss
 
     def train(self, train_loader, val_loader=None):
@@ -85,9 +91,11 @@ class Solver(object):
 
         # Setup learning rates
         lr_steps = [int(k) for k in cfg.TRAIN.LEARNING_RATES.keys()]
-        
+
         #Setup the lr_scheduler
-        self.lr_scheduler = lr_scheduler.MultiStepLR(self.optimizer, lr_steps, gamma=0.1)
+        self.lr_scheduler = lr_scheduler.MultiStepLR(self.optimizer,
+                                                     lr_steps,
+                                                     gamma=0.1)
 
         start_iter = 0
         # Resume training
@@ -99,7 +107,7 @@ class Solver(object):
         train_loader_iter = iter(train_loader)
         for train_ind in range(start_iter, cfg.TRAIN.NUM_ITERATION + 1):
             self.lr_scheduler.step()
-            
+
             data_timer.tic()
             try:
                 batch_img, batch_voxel = train_loader_iter.next()
@@ -123,20 +131,23 @@ class Solver(object):
             if train_ind in lr_steps:
                 #for pytorch optimizer, learning rate can only be set when the optimizer is created
                 #or using torch.optim.lr_scheduler
-                print('Learing rate decreased to %f: ' % cfg.TRAIN.LEARNING_RATES[str(train_ind)])
+                print('Learing rate decreased to %f: ' %
+                      cfg.TRAIN.LEARNING_RATES[str(train_ind)])
 
             # Debugging modules
             #
             # Print status, run validation, check divergence, and save model.
             if train_ind % cfg.TRAIN.PRINT_FREQ == 0:
                 # Print the current loss
-                print('%s Iter: %d Loss: %f' % (datetime.now(), train_ind, loss))
+                print('%s Iter: %d Loss: %f' %
+                      (datetime.now(), train_ind, loss))
 
             if train_ind % cfg.TRAIN.VALIDATION_FREQ == 0 and val_loader is not None:
                 # Print test loss and params to check convergence every N iterations
 
                 val_losses = 0
-                val_num_iter = min(cfg.TRAIN.NUM_VALIDATION_ITERATIONS, len(val_loader))
+                val_num_iter = min(cfg.TRAIN.NUM_VALIDATION_ITERATIONS,
+                                   len(val_loader))
                 val_loader_iter = iter(val_loader)
                 for i in range(val_num_iter):
                     batch_img, batch_voxel = val_loader_iter.next()
@@ -168,24 +179,23 @@ class Solver(object):
         load the latest model'''
 
         save_path = os.path.join(save_dir, 'checkpoint.%d.pth' % (step))
-        
+
         #both states of the network and the optimizer need to be saved
         state_dict = {'net_state': self.net.state_dict()}
         state_dict.update({'optimizer_state': self.optimizer.state_dict()})
         torch.save(state_dict, save_path)
-        
+
         # Make a symlink for weights.npy
         symlink_path = os.path.join(save_dir, 'checkpoint.pth')
         if os.path.lexists(symlink_path):
             os.remove(symlink_path)
-            
+
         # Make a symlink to the latest network params
         os.symlink("%s" % os.path.abspath(save_path), symlink_path)
 
         # Write the losses
         with open(os.path.join(save_dir, 'loss.%d.txt' % step), 'w') as f:
             f.write('\n'.join([str(l) for l in training_losses]))
-
 
     def load(self, filename):
         if os.path.isfile(filename):
@@ -194,15 +204,14 @@ class Solver(object):
                 checkpoint = torch.load(filename)
             else:
                 checkpoint = torch.load(filename, map_location='cpu')
-            
+
             net_state = checkpoint['net_state']
             optim_state = checkpoint['optimizer_state']
-            
+
             self.net.load_state_dict(net_state)
             self.optimizer.load_state_dict(optim_state)
         else:
             raise Exception("no checkpoint found at '{}'".format(filename))
-    
 
     def test_output(self, x, y=None):
         """
@@ -216,12 +225,12 @@ class Solver(object):
             x (torch.Tensor): batch_img_tensor
             y (torch.Tensor): batch_voxel_tensor
         """
-        
+
         if torch.cuda.is_available():
             x = x.cuda()
             if y is not None:
                 y = y.cuda()
-        
+
         # Parse the result
         results = self.net(x, y, test=True)
         prediction = results[0]

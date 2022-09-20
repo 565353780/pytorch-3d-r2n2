@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import numpy as np
 import datetime as dt
 import torch.nn as nn
 
-from lib.config import cfg
-from lib.utils import weight_init
+from pytorch_3d_r2n2.lib.config import cfg
+from pytorch_3d_r2n2.lib.utils import weight_init
 
 
 class Net(nn.Module):
