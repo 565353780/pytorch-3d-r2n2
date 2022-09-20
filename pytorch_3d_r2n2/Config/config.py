@@ -6,100 +6,92 @@ from easydict import EasyDict as edict
 __C = edict()
 cfg = __C
 
-#
-# Common
-#
 __C.DATASET = './experiments/dataset/shapenet_1000.json'  # yaml/json file that specifies a dataset (training/testing)
 __C.NET_NAME = 'res_gru_net'
 __C.PROFILE = False
-
-__C.CONST = edict()
-__C.CONST.DEVICE = 'cuda0'
-__C.CONST.RNG_SEED = 0
-__C.CONST.IMG_W = 127
-__C.CONST.IMG_H = 127
-__C.CONST.N_VOX = 32
-__C.CONST.N_VIEWS = 5
-__C.CONST.BATCH_SIZE = 36
-__C.CONST.NETWORK_CLASS = 'ResidualGRUNet'
-__C.CONST.WEIGHTS = ''  # when set, load the weights from the file
-
-#
-# Directories
-#
-__C.DIR = edict()
-# Path where taxonomy.json is stored
-__C.DIR.SHAPENET_QUERY_PATH = './ShapeNet/ShapeNetVox32/'
-__C.DIR.MODEL_PATH = './ShapeNet/ShapeNetCore.v1/%s/%s/model.obj'
-__C.DIR.VOXEL_PATH = './ShapeNet/ShapeNetVox32/%s/%s/model.binvox'
-__C.DIR.RENDERING_PATH = './ShapeNet/ShapeNetRendering/%s/%s/rendering'
-__C.DIR.OUT_PATH = './output/default'
-
-#
-# Training
-#
-__C.TRAIN = edict()
-
-__C.TRAIN.RESUME_TRAIN = False
-__C.TRAIN.INITIAL_ITERATION = 0  # when the training resumes, set the iteration number
-__C.TRAIN.USE_REAL_IMG = False
-__C.TRAIN.DATASET_PORTION = [0, 0.8]
-
-# Data worker
-__C.TRAIN.NUM_WORKER = 5  # number of data workers
-__C.TRAIN.NUM_ITERATION = 60000  # maximum number of training iterations
-__C.TRAIN.WORKER_LIFESPAN = 100  # if use blender, kill a worker after some iteration to clear cache
-__C.TRAIN.WORKER_CAPACITY = 1000  # if use OSG, load only limited number of models at a time
-__C.TRAIN.NUM_RENDERING = 24
-__C.TRAIN.NUM_VALIDATION_ITERATIONS = 24
-__C.TRAIN.VALIDATION_FREQ = 2000
-__C.TRAIN.NAN_CHECK_FREQ = 2000
-__C.TRAIN.RANDOM_NUM_VIEWS = True  # feed in random # views if n_views > 1
-
 __C.QUEUE_SIZE = 15  # maximum number of minibatches that can be put in a data queue
 
-# Data augmentation
-__C.TRAIN.RANDOM_CROP = True
-__C.TRAIN.PAD_X = 10
-__C.TRAIN.PAD_Y = 10
-__C.TRAIN.FLIP = True
+CONST = edict()
+
+CONST.DEVICE = 'cuda0'
+CONST.RNG_SEED = 0
+CONST.IMG_W = 127
+CONST.IMG_H = 127
+CONST.N_VOX = 32
+CONST.N_VIEWS = 5
+CONST.BATCH_SIZE = 36
+CONST.NETWORK_CLASS = 'ResidualGRUNet'
+CONST.WEIGHTS = ''  # when set, load the weights from the file
+
+__C.CONST = CONST
+
+DIR = edict()
+DIR.SHAPENET_QUERY_PATH = './ShapeNet/ShapeNetVox32/'
+DIR.MODEL_PATH = './ShapeNet/ShapeNetCore.v1/%s/%s/model.obj'
+DIR.VOXEL_PATH = './ShapeNet/ShapeNetVox32/%s/%s/model.binvox'
+DIR.RENDERING_PATH = './ShapeNet/ShapeNetRendering/%s/%s/rendering'
+DIR.OUT_PATH = './output/default'
+
+__C.DIR = DIR
+
+TRAIN = edict()
+TRAIN.RESUME_TRAIN = False
+TRAIN.INITIAL_ITERATION = 0  # when the training resumes, set the iteration number
+TRAIN.USE_REAL_IMG = False
+TRAIN.DATASET_PORTION = [0, 0.8]
+
+TRAIN.NUM_WORKER = 5  # number of data workers
+TRAIN.NUM_ITERATION = 60000  # maximum number of training iterations
+TRAIN.WORKER_LIFESPAN = 100  # if use blender, kill a worker after some iteration to clear cache
+TRAIN.WORKER_CAPACITY = 1000  # if use OSG, load only limited number of models at a time
+TRAIN.NUM_RENDERING = 24
+TRAIN.NUM_VALIDATION_ITERATIONS = 24
+TRAIN.VALIDATION_FREQ = 2000
+TRAIN.NAN_CHECK_FREQ = 2000
+TRAIN.RANDOM_NUM_VIEWS = True  # feed in random # views if n_views > 1
+
+TRAIN.RANDOM_CROP = True
+TRAIN.PAD_X = 10
+TRAIN.PAD_Y = 10
+TRAIN.FLIP = True
 
 # For no random bg images, add random colors
-__C.TRAIN.NO_BG_COLOR_RANGE = [[225, 255], [225, 255], [225, 255]]
-__C.TRAIN.RANDOM_BACKGROUND = False
-__C.TRAIN.SIMPLE_BACKGROUND_RATIO = 0.5  # ratio of the simple backgrounded images
+TRAIN.NO_BG_COLOR_RANGE = [[225, 255], [225, 255], [225, 255]]
+TRAIN.RANDOM_BACKGROUND = False
+TRAIN.SIMPLE_BACKGROUND_RATIO = 0.5  # ratio of the simple backgrounded images
 
 # Learning
 # For SGD use 0.1, for ADAM, use 0.0001
-__C.TRAIN.DEFAULT_LEARNING_RATE = 1e-4
-__C.TRAIN.POLICY = 'adam'  # def: sgd, adam
+TRAIN.DEFAULT_LEARNING_RATE = 1e-4
+TRAIN.POLICY = 'adam'  # def: sgd, adam
 # The EasyDict can't use dict with integers as keys
-__C.TRAIN.LEARNING_RATES = {'20000': 1e-5, '60000': 1e-6}
-__C.TRAIN.MOMENTUM = 0.90
+TRAIN.LEARNING_RATES = {'20000': 1e-5, '60000': 1e-6}
+TRAIN.MOMENTUM = 0.90
 # weight decay or regularization constant. If not set, the loss can diverge
 # after the training almost converged since weight can increase indefinitely
 # (for cross entropy loss). Too high regularization will also hinder training.
-__C.TRAIN.WEIGHT_DECAY = 0.00005
-__C.TRAIN.LOSS_LIMIT = 2  # stop training if the loss exceeds the limit
-__C.TRAIN.SAVE_FREQ = 10000  # weights will be overwritten every save_freq
-__C.TRAIN.PRINT_FREQ = 40
+TRAIN.WEIGHT_DECAY = 0.00005
+TRAIN.LOSS_LIMIT = 2  # stop training if the loss exceeds the limit
+TRAIN.SAVE_FREQ = 10000  # weights will be overwritten every save_freq
+TRAIN.PRINT_FREQ = 40
 
-#
-# Testing options
-#
-__C.TEST = edict()
-__C.TEST.EXP_NAME = 'test'
-__C.TEST.USE_IMG = False
-__C.TEST.MODEL_ID = []
-__C.TEST.DATASET_PORTION = [0.8, 1]
-__C.TEST.SAMPLE_SIZE = 0
-__C.TEST.IMG_PATH = ''
-__C.TEST.AZIMUTH = []
-__C.TEST.NO_BG_COLOR_RANGE = [[240, 240], [240, 240], [240, 240]]
+__C.TRAIN = TRAIN
 
-__C.TEST.VISUALIZE = False
-__C.TEST.VOXEL_THRESH = [0.4]
+TEST = edict()
 
+TEST.EXP_NAME = 'test'
+TEST.USE_IMG = False
+TEST.MODEL_ID = []
+TEST.DATASET_PORTION = [0.8, 1]
+TEST.SAMPLE_SIZE = 0
+TEST.IMG_PATH = ''
+TEST.AZIMUTH = []
+TEST.NO_BG_COLOR_RANGE = [[240, 240], [240, 240], [240, 240]]
+
+TEST.VISUALIZE = False
+TEST.VOXEL_THRESH = [0.4]
+
+__C.TEST = TEST
 
 def _merge_a_into_b(a, b):
     """Merge config dictionary a into config dictionary b, clobbering the
