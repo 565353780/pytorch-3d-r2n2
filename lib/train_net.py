@@ -23,6 +23,7 @@ def cleanup_handle(func):
             # kill_processes(train_queue, train_processes)
             # kill_processes(val_queue, val_processes)
             raise
+
     return func_wrapper
 
 
