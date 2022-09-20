@@ -1,6 +1,10 @@
-import numpy as np
-import collections
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import torch
+import collections
+import numpy as np
+
 
 #utility function to check nan
 def has_nan(x):
@@ -11,6 +15,7 @@ def has_nan(x):
     True. If there is any nan in x, then the function will return True.
     """
     return (x != x).any()
+
 
 #utility function to customize weight initialization
 def weight_init(w_shape, mean=0, std=0.01, filler='msra'):
@@ -27,17 +32,20 @@ def weight_init(w_shape, mean=0, std=0.01, filler='msra'):
             n = (fan_in + fan_out) / 2.
         else:
             raise NotImplementedError(
-                    'Filter shape with ndim > 5 not supported: len(w_shape) = %d' % len(w_shape))
+                'Filter shape with ndim > 5 not supported: len(w_shape) = %d' %
+                len(w_shape))
     else:
-        raise Exception("w_shape should be an instance of collections.Iterable")
-    
+        raise Exception(
+            "w_shape should be an instance of collections.Iterable")
+
     if filler == 'gaussian':
         np_values = np.asarray(rng.normal(mean, std, w_shape))
     elif filler == 'msra':
         np_values = np.asarray(rng.normal(mean, np.sqrt(2. / n), w_shape))
     elif filler == 'xavier':
         scale = np.sqrt(3. / n)
-        np_values = np.asarray(rng.uniform(low=-scale, high=scale, size=w_shape))
+        np_values = np.asarray(
+            rng.uniform(low=-scale, high=scale, size=w_shape))
     elif filler == 'constant':
         np_values = mean * np.ones(w_shape)
     elif filler == 'orth':
@@ -49,36 +57,3 @@ def weight_init(w_shape, mean=0, std=0.01, filler='msra'):
         raise NotImplementedError('Filler %s not implemented' % filler)
     torch_tensor = torch.from_numpy(np_values).type(torch.FloatTensor)
     return torch_tensor
-
-###############################################################################
-#                                                                             #
-#                  original time utility class                                #
-#                                                                             #
-###############################################################################
-
-import time
-
-class Timer(object):
-    """A simple timer."""
-
-    def __init__(self):
-        self.total_time = 0.
-        self.calls = 0
-        self.start_time = 0.
-        self.diff = 0.
-        self.average_time = 0.
-
-    def tic(self):
-        # using time.time instead of time.clock because time time.clock
-        # does not normalize for multithreading
-        self.start_time = time.time()
-
-    def toc(self, average=True):
-        self.diff = time.time() - self.start_time
-        self.total_time += self.diff
-        self.calls += 1
-        self.average_time = self.total_time / self.calls
-        if average:
-            return self.average_time
-        else:
-            return self.diff

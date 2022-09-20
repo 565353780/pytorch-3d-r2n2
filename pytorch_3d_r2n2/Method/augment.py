@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import numpy as np
 from PIL import Image
 
 from pytorch_3d_r2n2.Config.config import cfg
+
 
 def image_transform(img, crop_x, crop_y, crop_loc=None, color_tint=None):
     """
@@ -40,7 +41,10 @@ def crop_center(im, new_height, new_width):
 
 
 def add_random_color_background(im, color_range):
-    r, g, b = [np.random.randint(color_range[i][0], color_range[i][1] + 1) for i in range(3)]
+    r, g, b = [
+        np.random.randint(color_range[i][0], color_range[i][1] + 1)
+        for i in range(3)
+    ]
 
     if isinstance(im, Image.Image):
         im = np.array(im)
@@ -57,8 +61,9 @@ def add_random_color_background(im, color_range):
 
 def preprocess_img(im, train=True):
     # add random background
-    im = add_random_color_background(im, cfg.TRAIN.NO_BG_COLOR_RANGE if train else
-                                     cfg.TEST.NO_BG_COLOR_RANGE)
+    im = add_random_color_background(
+        im,
+        cfg.TRAIN.NO_BG_COLOR_RANGE if train else cfg.TEST.NO_BG_COLOR_RANGE)
 
     # If the image has alpha channel, remove it.
     im_rgb = np.array(im)[:, :, :3].astype(np.float32)
@@ -83,11 +88,10 @@ def test(fn):
     print(imt.shape)
     plt.imshow(imt)
     plt.show()
-    
-    
-    
+
+
 if __name__ == '__main__':
-    test("/Users/wangchu/Desktop/shapeNet_rendering_chair03.png")
+    test("/home/chli/chLi/shapeNet_rendering_chair03.png")
     """
     im = Image.open("/Users/wangchu/Desktop/online_product_chair.JPG")
     print(preprocess_img(im, train=False).shape)
@@ -95,4 +99,3 @@ if __name__ == '__main__':
     plt.imshow(im)
     plt.show
     """
-    

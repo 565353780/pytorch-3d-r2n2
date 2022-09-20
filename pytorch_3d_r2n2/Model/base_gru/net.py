@@ -7,7 +7,7 @@ import torch.nn as nn
 
 from pytorch_3d_r2n2.Config.config import cfg
 
-from pytorch_3d_r2n2.lib.utils import weight_init
+from pytorch_3d_r2n2.Method.utils import weight_init
 
 
 class Net(nn.Module):

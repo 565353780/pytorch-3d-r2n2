@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import fileinput
 import random
 import os.path
@@ -256,28 +259,34 @@ def parse_mtl(fname):
             # Diffuse texture
             # map_Kd texture_diffuse.jpg
             if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapDiffuse"] = texture_relative_path(
+                    chunks[1])
 
             # Ambient texture
             # map_Ka texture_ambient.jpg
             if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapAmbient"] = texture_relative_path(
+                    chunks[1])
 
             # Specular texture
             # map_Ks texture_specular.jpg
             if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapSpecular"] = texture_relative_path(
+                    chunks[1])
 
             # Alpha texture
             # map_d texture_alpha.png
             if chunks[0] == "map_d" and len(chunks) == 2:
                 materials[identifier]["transparent"] = True
-                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapAlpha"] = texture_relative_path(
+                    chunks[1])
 
             # Bump texture
             # map_bump texture_bump.jpg or bump texture_bump.jpg
-            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
+            if (chunks[0] == "map_bump"
+                    or chunks[0] == "bump") and len(chunks) == 2:
+                materials[identifier]["mapBump"] = texture_relative_path(
+                    chunks[1])
 
             # Split the remaining parameters.
             if len(chunks) > 1:
@@ -286,20 +295,29 @@ def parse_mtl(fname):
             # Diffuse color
             # Kd 1.000 1.000 1.000
             if chunks[0] == "Kd" and len(chunks) == 4:
-                materials[identifier]["colorDiffuse"] = [float(chunks[1]), float(chunks[2]),
-                                                         float(chunks[3])]
+                materials[identifier]["colorDiffuse"] = [
+                    float(chunks[1]),
+                    float(chunks[2]),
+                    float(chunks[3])
+                ]
 
             # Ambient color
             # Ka 1.000 1.000 1.000
             if chunks[0] == "Ka" and len(chunks) == 4:
-                materials[identifier]["colorAmbient"] = [float(chunks[1]), float(chunks[2]),
-                                                         float(chunks[3])]
+                materials[identifier]["colorAmbient"] = [
+                    float(chunks[1]),
+                    float(chunks[2]),
+                    float(chunks[3])
+                ]
 
             # Specular color
             # Ks 1.000 1.000 1.000
             if chunks[0] == "Ks" and len(chunks) == 4:
-                materials[identifier]["colorSpecular"] = [float(chunks[1]), float(chunks[2]),
-                                                          float(chunks[3])]
+                materials[identifier]["colorSpecular"] = [
+                    float(chunks[1]),
+                    float(chunks[2]),
+                    float(chunks[3])
+                ]
 
             # Specular coefficient
             # Ns 154.000
@@ -311,7 +329,8 @@ def parse_mtl(fname):
             if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
                 materials[identifier]["transparent"] = True
                 if TRANSPARENCY == "invert":
-                    materials[identifier]["transparency"] = 1.0 - float(chunks[1])
+                    materials[identifier]["transparency"] = 1.0 - float(
+                        chunks[1])
                 else:
                     materials[identifier]["transparency"] = float(chunks[1])
 
@@ -531,7 +550,8 @@ def generate_face(f, fc):
     hasFaceVertexUvs = (len(f['uv']) >= nVertices)
 
     hasFaceNormals = False  # don't export any face normals (as they are computed in engine)
-    hasFaceVertexNormals = (len(f["normal"]) >= nVertices and SHADING == "smooth")
+    hasFaceVertexNormals = (len(f["normal"]) >= nVertices
+                            and SHADING == "smooth")
 
     hasFaceColors = BAKE_COLORS
     hasFaceVertexColors = False  # not supported in OBJ
@@ -598,7 +618,8 @@ def generate_vertex(v, option_vertices_truncate, scale):
     if not option_vertices_truncate:
         return TEMPLATE_VERTEX % (v[0], v[1], v[2])
     else:
-        return TEMPLATE_VERTEX_TRUNCATE % (scale * v[0], scale * v[1], scale * v[2])
+        return TEMPLATE_VERTEX_TRUNCATE % (scale * v[0], scale * v[1],
+                                           scale * v[2])
 
 
 def generate_normal(n):
@@ -621,7 +642,8 @@ def generate_color_decimal(c):
 # Morphs
 # #####################################################
 def generate_morph_vertex(name, vertices):
-    vertex_string = ",".join(generate_vertex(v, TRUNCATE, SCALE) for v in vertices)
+    vertex_string = ",".join(
+        generate_vertex(v, TRUNCATE, SCALE) for v in vertices)
     return TEMPLATE_MORPH_VERTICES % (name, vertex_string)
 
 
@@ -709,12 +731,14 @@ def generate_morph_targets(morphfiles, n_vertices, infile):
                         top(morphVertices)
 
                     morphVertexData.append((get_name(name), morphVertices))
-                    print("adding [%s] with %d vertices" % (name, n_morph_vertices))
+                    print("adding [%s] with %d vertices" %
+                          (name, n_morph_vertices))
 
     morphTargets = ""
     if len(morphVertexData):
         morphTargets = "\n%s\n\t" % ",\n".join(
-            generate_morph_vertex(name, vertices) for name, vertices in morphVertexData)
+            generate_morph_vertex(name, vertices)
+            for name, vertices in morphVertexData)
 
     return morphTargets
 
@@ -752,8 +776,10 @@ def generate_morph_colors(colorfiles, n_vertices, n_faces):
 
             else:
 
-                morphMaterialColors = extract_material_colors(morphMaterials, morphMtllib, normpath)
-                morphFaceColors = extract_face_colors(morphFaces, morphMaterialColors)
+                morphMaterialColors = extract_material_colors(
+                    morphMaterials, morphMtllib, normpath)
+                morphFaceColors = extract_face_colors(morphFaces,
+                                                      morphMaterialColors)
                 morphColorData.append((get_name(name), morphFaceColors))
 
                 # take first color map for baking into face colors
@@ -762,12 +788,14 @@ def generate_morph_colors(colorfiles, n_vertices, n_faces):
                     colorFaces = morphFaces
                     materialColors = morphMaterialColors
 
-                print("adding [%s] with %d face colors" % (name, len(morphFaceColors)))
+                print("adding [%s] with %d face colors" %
+                      (name, len(morphFaceColors)))
 
     morphColors = ""
     if len(morphColorData):
         morphColors = "\n%s\n\t" % ",\n".join(
-            generate_morph_color(name, colors) for name, colors in morphColorData)
+            generate_morph_color(name, colors)
+            for name, colors in morphColorData)
 
     return morphColors, colorFaces, materialColors
 
@@ -821,8 +849,10 @@ def generate_materials(mtl, materials):
             if BAKE_COLORS:
                 mtl[m]['vertexColors'] = "face"
 
-            mtl_raw = ",\n".join(
-                ['\t"%s" : %s' % (n, value2string(v)) for n, v in sorted(mtl[m].items())])
+            mtl_raw = ",\n".join([
+                '\t"%s" : %s' % (n, value2string(v))
+                for n, v in sorted(mtl[m].items())
+            ])
             mtl_string = "\t{\n%s\n\t}" % mtl_raw
             mtl_array.append([index, mtl_string])
 
@@ -836,7 +866,11 @@ def generate_mtl(materials):
     mtl = {}
     for m in materials:
         index = materials[m]
-        mtl[m] = {'DbgName': m, 'DbgIndex': index, 'DbgColor': generate_color(index)}
+        mtl[m] = {
+            'DbgName': m,
+            'DbgIndex': index,
+            'DbgColor': generate_color(index)
+        }
     return mtl
 
 
@@ -889,35 +923,45 @@ def create_materials(materials, mtlfilename, basename):
 # Faces
 # #####################################################
 def is_triangle_flat(f):
-    return len(f['vertex']) == 3 and not (f["normal"] and SHADING == "smooth") and not f['uv']
+    return len(f['vertex']) == 3 and not (f["normal"] and SHADING
+                                          == "smooth") and not f['uv']
 
 
 def is_triangle_flat_uv(f):
-    return len(f['vertex']) == 3 and not (f["normal"] and SHADING == "smooth") and len(f['uv']) == 3
+    return len(f['vertex']) == 3 and not (f["normal"] and SHADING
+                                          == "smooth") and len(f['uv']) == 3
 
 
 def is_triangle_smooth(f):
-    return len(f['vertex']) == 3 and f["normal"] and SHADING == "smooth" and not f['uv']
+    return len(f['vertex']
+               ) == 3 and f["normal"] and SHADING == "smooth" and not f['uv']
 
 
 def is_triangle_smooth_uv(f):
-    return len(f['vertex']) == 3 and f["normal"] and SHADING == "smooth" and len(f['uv']) == 3
+    return len(
+        f['vertex']) == 3 and f["normal"] and SHADING == "smooth" and len(
+            f['uv']) == 3
 
 
 def is_quad_flat(f):
-    return len(f['vertex']) == 4 and not (f["normal"] and SHADING == "smooth") and not f['uv']
+    return len(f['vertex']) == 4 and not (f["normal"] and SHADING
+                                          == "smooth") and not f['uv']
 
 
 def is_quad_flat_uv(f):
-    return len(f['vertex']) == 4 and not (f["normal"] and SHADING == "smooth") and len(f['uv']) == 4
+    return len(f['vertex']) == 4 and not (f["normal"] and SHADING
+                                          == "smooth") and len(f['uv']) == 4
 
 
 def is_quad_smooth(f):
-    return len(f['vertex']) == 4 and f["normal"] and SHADING == "smooth" and not f['uv']
+    return len(f['vertex']
+               ) == 4 and f["normal"] and SHADING == "smooth" and not f['uv']
 
 
 def is_quad_smooth_uv(f):
-    return len(f['vertex']) == 4 and f["normal"] and SHADING == "smooth" and len(f['uv']) == 4
+    return len(
+        f['vertex']) == 4 and f["normal"] and SHADING == "smooth" and len(
+            f['uv']) == 4
 
 
 def sort_faces(faces):

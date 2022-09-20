@@ -5,7 +5,7 @@ import torch
 from torch.autograd import Variable
 
 from pytorch_3d_r2n2.Model.base_gru.net import Net
-from pytorch_3d_r2n2.lib.layers import SoftmaxWithLoss3D
+from pytorch_3d_r2n2.Model.layers import SoftmaxWithLoss3D
 
 
 class BaseGRUNet(Net):

@@ -1,20 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import torch
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 
-from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
-from pytorch_3d_r2n2.lib.data_io import category_model_id_pair, get_voxel_file, get_rendering_file
-
 from pytorch_3d_r2n2.Config.config import cfg
 
 from pytorch_3d_r2n2.Method.binvox import read_as_3d_array
+from pytorch_3d_r2n2.Method.augment import preprocess_img
+from pytorch_3d_r2n2.Method.io import category_model_id_pair, get_voxel_file, get_rendering_file
+
 
 class ShapeNetDataset(Dataset):
+
     def __init__(self, dataset_portion=[]):
         self.samples = category_model_id_pair(dataset_portion)
-    
+
     def __len__(self):
         return len(self.samples)
 
@@ -23,6 +26,7 @@ class ShapeNetDataset(Dataset):
 
 
 class ShapeNetCollateFn(object):
+
     def __init__(self, train=True):
         self.train = train
 
@@ -48,7 +52,7 @@ class ShapeNetCollateFn(object):
             curr_n_views = np.random.randint(n_views) + 1
         else:
             curr_n_views = n_views
-        
+
         # This will be fed into the queue. create new batch everytime
         batch_img = np.zeros((curr_n_views, batch_size, 3, img_h, img_w))
         batch_voxel = np.zeros((batch_size, 2, n_vox, n_vox, n_vox))
@@ -69,13 +73,13 @@ class ShapeNetCollateFn(object):
 
             batch_voxel[batch_id, 0, :, :, :] = voxel_data < 1
             batch_voxel[batch_id, 1, :, :, :] = voxel_data
-        
+
         # float32 should be enough.
         batch_img = torch.from_numpy(batch_img.astype(np.float32))
         batch_voxel = torch.from_numpy(batch_voxel.astype(np.float32))
 
         return batch_img, batch_voxel
-    
+
     def load_img(self, category, model_id, image_id):
         image_fn = get_rendering_file(category, model_id, image_id)
         im = Image.open(image_fn)

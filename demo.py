@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import torch
 import shutil
 import numpy as np
-
-import torch
-
 from PIL import Image
 
-from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
 from pytorch_3d_r2n2.Config.config import cfg, cfg_from_list
-from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
-from pytorch_3d_r2n2.lib.solver import Solver
-from pytorch_3d_r2n2.lib.voxel import voxel2obj
+
+from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
+
+from pytorch_3d_r2n2.Method.augment import preprocess_img
+from pytorch_3d_r2n2.Method.voxel import voxel2obj
+
+from pytorch_3d_r2n2.Module.trainer import Solver
 
 DEFAULT_WEIGHTS = '/home/chli/chLi/3D-R2N2/checkpoint.pth'
+
 
 def cmd_exists(cmd):
     return shutil.which(cmd) is not None

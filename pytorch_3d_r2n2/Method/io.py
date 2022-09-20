@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import json
 from collections import OrderedDict
@@ -40,7 +43,8 @@ def category_model_id_pair(dataset_portion=[]):
         category_name_pair.extend([(cat['id'], model_id)
                                    for model_id in portioned_models])
 
-    print('lib/data_io.py: model paths from %s' % (cfg.DATASET))
+    print("[INFO][io::category_model_id_pair]")
+    print("\t model paths from " + cfg.DATASET)
 
     return category_name_pair
 
@@ -100,6 +104,7 @@ def category_model_id_dict(dataset_portion=[]):
                                         'num_portioned_models':num_models,\
                                         'range_in_test': (counter, counter+num_portioned_models)})
         counter += num_portioned_models
-    print('lib/data_io.py: model paths from %s' % (cfg.DATASET))
+    print("[INFO][io::category_model_id_dict]")
+    print("\t model paths from " + cfg.DATASET)
 
     return category_name_dict_list

@@ -1,16 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
 import numpy as np
 import sklearn.metrics
-
 from torch.utils.data import DataLoader
 
 from pytorch_3d_r2n2.Config.config import cfg
 
 from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
 
-from pytorch_3d_r2n2.lib.solver import Solver
-from pytorch_3d_r2n2.lib.dataset import ShapeNetDataset, ShapeNetCollateFn
-from pytorch_3d_r2n2.lib.voxel import evaluate_voxel_prediction
+from pytorch_3d_r2n2.Dataset.dataset import ShapeNetDataset, ShapeNetCollateFn
+
+from pytorch_3d_r2n2.Method.voxel import evaluate_voxel_prediction
+
+from pytorch_3d_r2n2.Module.trainer import Solver
 
 
 def test_net():

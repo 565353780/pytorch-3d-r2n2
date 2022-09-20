@@ -6,7 +6,7 @@ import torch.nn as nn
 from torch.nn import \
     Linear, Conv2d, MaxPool2d, LeakyReLU, Tanh, Sigmoid
 
-from pytorch_3d_r2n2.lib.layers import FCConv3DLayer_torch
+from pytorch_3d_r2n2.Model.layers import FCConv3DLayer_torch
 
 
 class Encoder(nn.Module):
