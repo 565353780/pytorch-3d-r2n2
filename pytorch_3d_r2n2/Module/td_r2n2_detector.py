@@ -10,10 +10,12 @@ from pytorch_3d_r2n2.Config.config import cfg
 
 from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
 
+from pytorch_3d_r2n2.Method.path import createFileFolder
 from pytorch_3d_r2n2.Method.augment import preprocess_img
+from pytorch_3d_r2n2.Method.voxel import voxel2obj
 
 
-class Detector(object):
+class TDR2N2Detector(object):
 
     def __init__(self, model_file_path=None):
         self.model = ResidualGRUNet()
@@ -27,14 +29,14 @@ class Detector(object):
 
     def loadModel(self, model_file_path):
         if not os.path.exists(model_file_path):
-            print("[ERROR][Detector::loadModel]")
+            print("[ERROR][TDR2N2Detector::loadModel]")
             print("\t model_file not exist!")
             return False
 
         self.model.cuda()
         self.model.eval()
 
-        print("[INFO][Detector]")
+        print("[INFO][TDR2N2Detector]")
         print("\t start loading checkpoint from " + model_file_path + "...")
         self.checkpoint = torch.load(model_file_path)
 
@@ -70,6 +72,24 @@ class Detector(object):
         data = self.detectImages(image_list)
         return data
 
+    def saveAsObj(self, data, save_obj_file_path):
+        voxel_prediction = data['predictions']['prediction'].detach().cpu(
+        ).numpy()
+        createFileFolder(save_obj_file_path)
+        voxel2obj(save_obj_file_path,
+                  voxel_prediction[0, 1] > cfg.TEST.VOXEL_THRESH)
+        return True
+
 
 def demo():
+    save_obj_file_path = "./prediction.obj"
+
+    td_r2n2_detector = TDR2N2Detector('/home/chli/chLi/3D-R2N2/checkpoint.pth')
+
+    image_file_path_list = []
+    for i in range(3):
+        image_file_path = "./images/" + str(i) + ".png"
+        image_file_path_list.append(image_file_path)
+    data = td_r2n2_detector.detectImageFiles(image_file_path_list)
+    td_r2n2_detector.saveAsObj(data, save_obj_file_path)
     return True

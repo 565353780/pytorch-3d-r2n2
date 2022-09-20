@@ -14,10 +14,10 @@ from pytorch_3d_r2n2.Config.config import cfg
 from pytorch_3d_r2n2.Method.time import getCurrentTimeStr
 from pytorch_3d_r2n2.Method.utils import has_nan, max_or_nan
 
-from pytorch_3d_r2n2.Module.detector import Detector
+from pytorch_3d_r2n2.Module.td_r2n2_detector import TDR2N2Detector
 
 
-class Trainer(Detector):
+class TDR2N2Trainer(TDR2N2Detector):
 
     def __init__(self, model_file_path=None):
         super().__init__(model_file_path)
@@ -51,13 +51,13 @@ class Trainer(Detector):
 
     def loadModel(self, model_file_path):
         if not super().loadModel(model_file_path):
-            print("[ERROR][Trainer::loadModel]")
-            print("\t loadModel in Detector failed!")
+            print("[ERROR][TDR2N2Trainer::loadModel]")
+            print("\t loadModel in TDR2N2Detector failed!")
             return False
 
         self.model.train()
         if not self.loadOptimizer(cfg.TRAIN.POLICY):
-            print("[ERROR][Trainer::loadModel]")
+            print("[ERROR][TDR2N2Trainer::loadModel]")
             print("\t loadOptimizer failed!")
             return False
 
@@ -148,7 +148,7 @@ class Trainer(Detector):
             if train_step % cfg.TRAIN.NAN_CHECK_FREQ == 0:
                 nan_or_max_param = max_or_nan(self.model.parameters())
                 if has_nan(nan_or_max_param):
-                    print("[ERROR][Trainer::train]")
+                    print("[ERROR][TDR2N2Trainer::train]")
                     print("\t NaN detected! stop training!")
                     return False
 
@@ -159,7 +159,7 @@ class Trainer(Detector):
 
             #loss is a Variable containing torch.FloatTensor of size 1
             if loss.item() > cfg.TRAIN.LOSS_LIMIT:
-                print("[ERROR][Trainer::train]")
+                print("[ERROR][TDR2N2Trainer::train]")
                 print("\t cost exceeds the threshold! stop training!")
                 return False
         return True
