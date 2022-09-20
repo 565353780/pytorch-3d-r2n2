@@ -11,10 +11,10 @@ from multiprocessing import Process, Event
 
 from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
 from pytorch_3d_r2n2.lib.data_io import get_voxel_file, get_rendering_file
-from pytorch_3d_r2n2.lib.binvox_rw import read_as_3d_array
 
 from pytorch_3d_r2n2.Config.config import cfg
 
+from pytorch_3d_r2n2.Method.binvox import read_as_3d_array
 
 def print_error(func):
     '''Flush out error messages. Mainly used for debugging separate processes'''

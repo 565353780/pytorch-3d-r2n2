@@ -1,92 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-"""
-Binvox to Numpy and back.
-
->>> import numpy as np
->>> import binvox_rw
->>> with open('chair.binvox', 'rb') as f:
-...     m1 = binvox_rw.read_as_3d_array(f)
-...
->>> m1.dims
-[32, 32, 32]
->>> m1.scale
-41.133000000000003
->>> m1.translate
-[0.0, 0.0, 0.0]
->>> with open('chair_out.binvox', 'wb') as f:
-...     m1.write(f)
-...
->>> with open('chair_out.binvox', 'rb') as f:
-...     m2 = binvox_rw.read_as_3d_array(f)
-...
->>> m1.dims==m2.dims
-True
->>> m1.scale==m2.scale
-True
->>> m1.translate==m2.translate
-True
->>> np.all(m1.data==m2.data)
-True
-
->>> with open('chair.binvox', 'rb') as f:
-...     md = binvox_rw.read_as_3d_array(f)
-...
->>> with open('chair.binvox', 'rb') as f:
-...     ms = binvox_rw.read_as_coord_array(f)
-...
->>> data_ds = binvox_rw.dense_to_sparse(md.data)
->>> data_sd = binvox_rw.sparse_to_dense(ms.data, 32)
->>> np.all(data_sd==md.data)
-True
->>> # the ordering of elements returned by numpy.nonzero changes with axis
->>> # ordering, so to compare for equality we first lexically sort the voxels.
->>> np.all(ms.data[:, np.lexsort(ms.data)] == data_ds[:, np.lexsort(data_ds)])
-True
-"""
 
 import numpy as np
 
-
-class Voxels(object):
-    """ Holds a binvox model.
-    data is either a three-dimensional numpy boolean array (dense representation)
-    or a two-dimensional numpy float array (coordinate representation).
-
-    dims, translate and scale are the model metadata.
-
-    dims are the voxel dimensions, e.g. [32, 32, 32] for a 32x32x32 model.
-
-    scale and translate relate the voxels to the original model coordinates.
-
-    To translate voxel coordinates i, j, k to original coordinates x, y, z:
-
-    x_n = (i+.5)/dims[0]
-    y_n = (j+.5)/dims[1]
-    z_n = (k+.5)/dims[2]
-    x = scale*x_n + translate[0]
-    y = scale*y_n + translate[1]
-    z = scale*z_n + translate[2]
-
-    """
-
-    def __init__(self, data, dims, translate, scale, axis_order):
-        self.data = data
-        self.dims = dims
-        self.translate = translate
-        self.scale = scale
-        assert (axis_order in ('xzy', 'xyz'))
-        self.axis_order = axis_order
-
-    def clone(self):
-        data = self.data.copy()
-        dims = self.dims[:]
-        translate = self.translate[:]
-        return Voxels(data, dims, translate, self.scale, self.axis_order)
-
-    def write(self, fp):
-        write(self, fp)
+from pytorch_3d_r2n2.Data.voxels import Voxels
 
 
 def read_header(fp):

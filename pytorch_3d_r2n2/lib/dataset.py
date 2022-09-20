@@ -4,11 +4,12 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 
-from pytorch_3d_r2n2.lib.binvox_rw import read_as_3d_array
 from pytorch_3d_r2n2.lib.data_augmentation import preprocess_img
 from pytorch_3d_r2n2.lib.data_io import category_model_id_pair, get_voxel_file, get_rendering_file
 
 from pytorch_3d_r2n2.Config.config import cfg
+
+from pytorch_3d_r2n2.Method.binvox import read_as_3d_array
 
 class ShapeNetDataset(Dataset):
     def __init__(self, dataset_portion=[]):
