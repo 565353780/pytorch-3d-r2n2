@@ -26,11 +26,11 @@ CONST.WEIGHTS = ''  # when set, load the weights from the file
 __C.CONST = CONST
 
 DIR = edict()
-DIR.SHAPENET_QUERY_PATH = './ShapeNet/ShapeNetVox32/'
-DIR.MODEL_PATH = './ShapeNet/ShapeNetCore.v1/%s/%s/model.obj'
-DIR.VOXEL_PATH = './ShapeNet/ShapeNetVox32/%s/%s/model.binvox'
-DIR.RENDERING_PATH = './ShapeNet/ShapeNetRendering/%s/%s/rendering'
-DIR.OUT_PATH = './output/default'
+DIR.SHAPENET_QUERY_PATH = '/home/chli/chLi/3D-R2N2/ShapeNetVox32/'
+DIR.MODEL_PATH = '/home/chli/chLi/ShapeNet/Core/ShapeNetCore.v1/%s/%s/model.obj'
+DIR.VOXEL_PATH = '/home/chli/chLi/3D-R2N2/ShapeNetVox32/%s/%s/model.binvox'
+DIR.RENDERING_PATH = '/home/chli/chLi/3D-R2N2/ShapeNetRendering/%s/%s/rendering'
+DIR.OUT_PATH = './output/models/'
 
 __C.DIR = DIR
 
@@ -92,6 +92,12 @@ TEST.VISUALIZE = False
 TEST.VOXEL_THRESH = [0.4]
 
 __C.TEST = TEST
+
+LOG = edict()
+
+LOG.log_folder_path = "./output/logs/"
+
+__C.LOG = LOG
 
 def _merge_a_into_b(a, b):
     """Merge config dictionary a into config dictionary b, clobbering the
