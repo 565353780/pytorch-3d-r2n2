@@ -4,6 +4,8 @@
 import os
 import sys
 import torch
+import numpy as np
+from PIL import Image
 from datetime import datetime
 from torch.optim import SGD, Adam, lr_scheduler
 
@@ -11,24 +13,11 @@ from pytorch_3d_r2n2.Config.config import cfg
 
 from pytorch_3d_r2n2.Data.timer import Timer
 
-from pytorch_3d_r2n2.Method.utils import has_nan
+from pytorch_3d_r2n2.Method.augment import preprocess_img
+from pytorch_3d_r2n2.Method.utils import has_nan, max_or_nan
 
 
-def max_or_nan(params):
-    params = list(params)
-    nan_or_max_param = torch.FloatTensor(len(params)).zero_()
-    if torch.cuda.is_available():
-        nan_or_max_param = nan_or_max_param.cuda()
-
-    for param_idx, param in enumerate(params):
-        # If there is nan, max will return nan
-        # Note that param is Variable
-        nan_or_max_param[param_idx] = torch.max(torch.abs(param)).item()
-        # print('param %d : %f' % (param_idx, nan_or_max_param[param_idx]))
-    return nan_or_max_param
-
-
-class Solver(object):
+class Trainer(object):
 
     def __init__(self, net):
         self.net = net
@@ -216,30 +205,31 @@ class Solver(object):
         else:
             raise Exception("no checkpoint found at '{}'".format(filename))
 
-    def test_output(self, x, y=None):
-        """
-        Generate the reconstruction, loss, and activation. Evaluate loss if
-        ground truth output is given. Otherwise, return reconstruction and
-        activation.
-        In test mode, if y is None, then the out is the [prediction].
-        In test mode, if y is not None, then the out is [prediction, loss].
+    def detectImageFiles(self, image_file_path_list):
+        data = {
+            'inputs': {},
+            'predictions': {},
+            'losses': {},
+        }
 
-        Args:
-            x (torch.Tensor): batch_img_tensor
-            y (torch.Tensor): batch_voxel_tensor
-        """
+        img_h = cfg.CONST.IMG_H
+        img_w = cfg.CONST.IMG_W
 
-        if torch.cuda.is_available():
-            x = x.cuda()
-            if y is not None:
-                y = y.cuda()
+        image_list = []
+        for image_file_path in image_file_path_list:
+            image = Image.open(image_file_path)
+            image = image.resize((img_h, img_w), Image.ANTIALIAS)
+            image = preprocess_img(image, train=False)
+            image = np.array(image).transpose((2, 0, 1)).astype(np.float32)
+            image_list.append([image])
 
-        # Parse the result
-        results = self.net(x, y, test=True)
-        prediction = results[0]
-        loss = results[1]
-        activations = results[2:]
-        if y is None:
-            return prediction, activations
-        else:
-            return prediction, loss, activations
+        image_array = np.array(image_list, dtype=np.float32)
+        data['inputs']['images'] = torch.from_numpy(image_array).cuda()
+        data['inputs']['y'] = None
+        data['inputs']['test'] = True
+
+        data = self.net(data)
+        return data
+
+def demo():
+    return True

@@ -13,7 +13,7 @@ class Encoder(nn.Module):
     def __init__(self, input_shape, n_convfilter, \
                  n_fc_filters, h_shape, conv3d_filter_shape):
         print("\ninitializing \"Encoder\"")
-        #input_shape = (self.batch_size, 3, img_w, img_h)
+        #  input_shape = (self.batch_size, 3, img_w, img_h)
         super(Encoder, self).__init__()
         #conv1
         self.conv1a = Conv2d(input_shape[1], n_convfilter[0], 7, padding=3)

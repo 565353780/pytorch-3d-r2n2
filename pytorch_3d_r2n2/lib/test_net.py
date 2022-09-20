@@ -14,7 +14,7 @@ from pytorch_3d_r2n2.Dataset.dataset import ShapeNetDataset, ShapeNetCollateFn
 
 from pytorch_3d_r2n2.Method.voxel import evaluate_voxel_prediction
 
-from pytorch_3d_r2n2.Module.trainer import Solver
+from pytorch_3d_r2n2.Module.trainer import Trainer
 
 
 def test_net():
@@ -30,7 +30,7 @@ def test_net():
 
     net.eval()
 
-    solver = Solver(net)
+    solver = Trainer(net)
     solver.load(cfg.CONST.WEIGHTS)
 
     # set constants

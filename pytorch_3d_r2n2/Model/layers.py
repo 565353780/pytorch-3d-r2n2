@@ -122,46 +122,32 @@ class Unpool3DLayer(nn.Module):
 class SoftmaxWithLoss3D(nn.Module):
 
     def __init__(self):
-        print("initializing \"SoftmaxWithLoss3D\"")
         super(SoftmaxWithLoss3D, self).__init__()
+        return
 
-    def forward(self, inputs, y=None, test=False):
+    def forward(self, data):
 
-        if type(test) is not bool:
+        if data['inputs']['test'] == False and data['inputs']['y'] is None:
             raise Exception(
-                "keyword argument \"test\" needs to be a bool type")
-        if (test == False) and (y is None):
-            raise Exception(
-                "\"y is None\" and \"test is False\" cannot happen at the same time"
+                "'y is None' and 'test is False' cannot happen at the same time"
             )
-        """
-        Before actually compute the loss, we need to address the possible numberical instability.
-        If some elements of inputs are very large, and we compute their exponential value, then we
-        might encounter some infinity. So we need to subtract them by the largest value along the 
-        "channels" dimension to avoid very large exponential.
-        """
         #the size of inputs and y is (batch_size, channels, depth, height, width)
         #torch.max return a tuple of (max_value, index_of_max_value)
-        max_channel = torch.max(inputs, dim=1, keepdim=True)[0]
-        adj_inputs = inputs - max_channel
+        max_channel = torch.max(data['predictions']['out'],
+                                dim=1,
+                                keepdim=True)[0]
+        adj_inputs = data['predictions']['out'] - max_channel
 
         exp_x = torch.exp(adj_inputs)
         sum_exp_x = torch.sum(exp_x, dim=1, keepdim=True)
+        data['predictions']['prediction'] = exp_x / sum_exp_x
 
         #if the ground truth is provided the loss will be computed
-        if y is not None:
-            loss = torch.mean(
-                              torch.sum(-y * adj_inputs, dim = 1, keepdim = True) + \
-                              torch.log(sum_exp_x))
-
-        #if this is in the test mode, then the prediction and loss need to be returned
-        if test:
-            prediction = exp_x / sum_exp_x
-            if y is not None:
-                return [prediction, loss]
-            else:
-                return [prediction]
-        return loss
+        if data['inputs']['y'] is not None:
+            data['losses']['loss'] = torch.mean(
+                torch.sum(-data['inputs']['y'] * adj_inputs, dim = 1, keepdim = True) + \
+                torch.log(sum_exp_x))
+        return data
 
 
 class Recurrent_BatchNorm3d(nn.Module):

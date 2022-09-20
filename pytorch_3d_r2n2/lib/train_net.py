@@ -12,7 +12,7 @@ from pytorch_3d_r2n2.Dataset.dataset import ShapeNetDataset, ShapeNetCollateFn
 
 #  from pytorch_3d_r2n2.Method.process import kill_processes
 
-from pytorch_3d_r2n2.Module.trainer import Solver
+from pytorch_3d_r2n2.Module.trainer import Trainer
 
 def cleanup_handle(func):
     '''Cleanup the data processes before exiting the program'''
@@ -60,7 +60,7 @@ def train_net():
     net.cuda()
 
     # Generate the solver
-    solver = Solver(net)
+    solver = Trainer(net)
 
     # Train the network
     solver.train(train_loader, val_loader)

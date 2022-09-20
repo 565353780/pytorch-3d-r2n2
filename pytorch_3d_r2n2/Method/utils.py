@@ -17,6 +17,20 @@ def has_nan(x):
     return (x != x).any()
 
 
+def max_or_nan(params):
+    params = list(params)
+    nan_or_max_param = torch.FloatTensor(len(params)).zero_()
+    if torch.cuda.is_available():
+        nan_or_max_param = nan_or_max_param.cuda()
+
+    for param_idx, param in enumerate(params):
+        # If there is nan, max will return nan
+        # Note that param is Variable
+        nan_or_max_param[param_idx] = torch.max(torch.abs(param)).item()
+        # print('param %d : %f' % (param_idx, nan_or_max_param[param_idx]))
+    return nan_or_max_param
+
+
 #utility function to customize weight initialization
 def weight_init(w_shape, mean=0, std=0.01, filler='msra'):
     rng = np.random.RandomState()
