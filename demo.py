@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import torch
-import shutil
 import numpy as np
 from PIL import Image
 
@@ -18,24 +17,20 @@ from pytorch_3d_r2n2.Module.trainer import Solver
 DEFAULT_WEIGHTS = '/home/chli/chLi/3D-R2N2/checkpoint.pth'
 
 
-def cmd_exists(cmd):
-    return shutil.which(cmd) is not None
-
-
 def load_demo_images():
     img_h = cfg.CONST.IMG_H
     img_w = cfg.CONST.IMG_W
 
-    imgs = []
+    image_list = []
 
     for i in range(3):
-        img = Image.open('./pytorch_3d_r2n2/imgs/%d.png' % i)
-        img = img.resize((img_h, img_w), Image.ANTIALIAS)
-        img = preprocess_img(img, train=False)
-        imgs.append([np.array(img).transpose( \
+        image = Image.open('./images/%d.png' % i)
+        image = image.resize((img_h, img_w), Image.ANTIALIAS)
+        image = preprocess_img(image, train=False)
+        image_list.append([np.array(image).transpose( \
                         (2, 0, 1)).astype(np.float32)])
-    ims_np = np.array(imgs).astype(np.float32)
-    return torch.from_numpy(ims_np)
+    image_array = np.array(image_list).astype(np.float32)
+    return torch.from_numpy(image_array)
 
 
 def main():
