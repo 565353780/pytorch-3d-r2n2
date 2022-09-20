@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from models.gru_net import GRUNet
 from models.res_gru_net import ResidualGRUNet
 

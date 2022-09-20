@@ -1,19 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import inspect
 from multiprocessing import Queue
-
 from torch.utils.data import DataLoader
 
-# Training related functions
 from models import load_model
 from lib.config import cfg
 from lib.dataset import ShapeNetDataset, ShapeNetCollateFn
 from lib.solver import Solver
-from lib.data_io import category_model_id_pair
-from lib.data_process import kill_processes, make_data_processes
-
-# Define globally accessible queues, will be used for clean exit when force
-# interrupted.
+from lib.data_process import kill_processes
 
 
 def cleanup_handle(func):
@@ -27,7 +23,6 @@ def cleanup_handle(func):
             # kill_processes(train_queue, train_processes)
             # kill_processes(val_queue, val_processes)
             raise
-
     return func_wrapper
 
 
@@ -55,25 +50,21 @@ def train_net():
 
     train_dataset = ShapeNetDataset(cfg.TRAIN.DATASET_PORTION)
     train_collate_fn = ShapeNetCollateFn()
-    train_loader = DataLoader(
-        dataset=train_dataset,
-        batch_size=cfg.CONST.BATCH_SIZE,
-        shuffle=True,
-        num_workers=cfg.TRAIN.NUM_WORKER,
-        collate_fn=train_collate_fn,
-        pin_memory=True
-    )
+    train_loader = DataLoader(dataset=train_dataset,
+                              batch_size=cfg.CONST.BATCH_SIZE,
+                              shuffle=True,
+                              num_workers=cfg.TRAIN.NUM_WORKER,
+                              collate_fn=train_collate_fn,
+                              pin_memory=True)
 
     val_dataset = ShapeNetDataset(cfg.TEST.DATASET_PORTION)
     val_collate_fn = ShapeNetCollateFn(train=False)
-    val_loader = DataLoader(
-        dataset=val_dataset,
-        batch_size=cfg.CONST.BATCH_SIZE,
-        shuffle=True,
-        num_workers=1,
-        collate_fn=val_collate_fn,
-        pin_memory=True
-    )
+    val_loader = DataLoader(dataset=val_dataset,
+                            batch_size=cfg.CONST.BATCH_SIZE,
+                            shuffle=True,
+                            num_workers=1,
+                            collate_fn=val_collate_fn,
+                            pin_memory=True)
 
     net.cuda()
 

@@ -11,12 +11,9 @@ from torch.nn import \
 from models.base_gru_net import BaseGRUNet
 from lib.layers import FCConv3DLayer_torch, Unpool3DLayer, SoftmaxWithLoss3D
 
-##########################################################################################
-#                                                                                        #
-#                      GRUNet definition using PyTorch                                   #
-#                                                                                        #
-##########################################################################################
+
 class GRUNet(BaseGRUNet):
+
     def __init__(self):
         print("initializing \"GRUNet\"")
         super(GRUNet, self).__init__()
@@ -33,11 +30,7 @@ class GRUNet(BaseGRUNet):
         #initialize all the parameters
         self.parameter_init()
 
-##########################################################################################
-#                                                                                        #
-#                      encoder definition using PyTorch                                  #
-#                                                                                        #
-##########################################################################################
+
 class encoder(nn.Module):
     def __init__(self, input_shape, n_convfilter, \
                  n_fc_filters, h_shape, conv3d_filter_shape):
@@ -87,22 +80,27 @@ class encoder(nn.Module):
                             padding = int((conv6_kernal_size - 1) / 2))
 
         #pooling layer
-        self.pool = MaxPool2d(kernel_size= 2, padding= 1)
+        self.pool = MaxPool2d(kernel_size=2, padding=1)
 
         #nonlinearities of the network
-        self.leaky_relu = LeakyReLU(negative_slope= 0.01)
+        self.leaky_relu = LeakyReLU(negative_slope=0.01)
         self.sigmoid = Sigmoid()
         self.tanh = Tanh()
 
         #find the input feature map size of the fully connected layer
-        fc7_feat_w, fc7_feat_h = self.fc_in_featmap_size(input_shape, num_pooling=6)
+        fc7_feat_w, fc7_feat_h = self.fc_in_featmap_size(input_shape,
+                                                         num_pooling=6)
         #define the fully connected layer
-        self.fc7 = Linear(int(n_convfilter[5] * fc7_feat_w * fc7_feat_h), n_fc_filters[0])
+        self.fc7 = Linear(int(n_convfilter[5] * fc7_feat_w * fc7_feat_h),
+                          n_fc_filters[0])
 
         #define the FCConv3DLayers in 3d convolutional gru unit
-        self.t_x_s_update = FCConv3DLayer_torch(n_fc_filters[0], conv3d_filter_shape, h_shape)
-        self.t_x_s_reset = FCConv3DLayer_torch(n_fc_filters[0], conv3d_filter_shape, h_shape)
-        self.t_x_rs = FCConv3DLayer_torch(n_fc_filters[0], conv3d_filter_shape, h_shape)
+        self.t_x_s_update = FCConv3DLayer_torch(n_fc_filters[0],
+                                                conv3d_filter_shape, h_shape)
+        self.t_x_s_reset = FCConv3DLayer_torch(n_fc_filters[0],
+                                               conv3d_filter_shape, h_shape)
+        self.t_x_rs = FCConv3DLayer_torch(n_fc_filters[0], conv3d_filter_shape,
+                                          h_shape)
 
     def forward(self, x, h, u):
         """
@@ -148,16 +146,15 @@ class encoder(nn.Module):
         for _ in range(num_pooling):
             #image downsampled by pooling layers
             #w_out= np.floor((w_in+ 2*padding[0]- dilation[0]*(kernel_size[0]- 1)- 1)/stride[0]+ 1)
-            fc7_feat_w = np.floor((fc7_feat_w + 2 * 1 - 1 * (2 - 1) - 1) / 2 + 1)
-            fc7_feat_h = np.floor((fc7_feat_h + 2 * 1 - 1 * (2 - 1) - 1) / 2 + 1)
+            fc7_feat_w = np.floor((fc7_feat_w + 2 * 1 - 1 * (2 - 1) - 1) / 2 +
+                                  1)
+            fc7_feat_h = np.floor((fc7_feat_h + 2 * 1 - 1 * (2 - 1) - 1) / 2 +
+                                  1)
         return fc7_feat_w, fc7_feat_h
-        
-##########################################################################################
-#                                                                                        #
-#                      dencoder definition using PyTorch                                 #
-#                                                                                        #
-##########################################################################################
+
+
 class decoder(nn.Module):
+
     def __init__(self, n_deconvfilter, h_shape):
         print("initializing \"decoder\"")
         super(decoder, self).__init__()
@@ -197,10 +194,10 @@ class decoder(nn.Module):
                             padding = int((conv11_kernel_size - 1) / 2))
 
         #pooling layer
-        self.unpool3d = Unpool3DLayer(unpool_size = 2)
+        self.unpool3d = Unpool3DLayer(unpool_size=2)
 
         #nonlinearities of the network
-        self.leaky_relu = LeakyReLU(negative_slope= 0.01)
+        self.leaky_relu = LeakyReLU(negative_slope=0.01)
 
     def forward(self, gru_out):
         gru_out_to_conv11 = nn.Sequential(self.unpool3d, self.conv7, self.leaky_relu, \
@@ -208,4 +205,3 @@ class decoder(nn.Module):
                                           self.unpool3d, self.conv9, self.leaky_relu, \
                                           self.conv10, self.leaky_relu, self.conv11)
         return gru_out_to_conv11(gru_out)
-

@@ -3,24 +3,23 @@
 
 import numpy as np
 import datetime as dt
+import torch.nn as nn
 
 from lib.config import cfg
 from lib.utils import weight_init
 
-import torch.nn as nn
-
-
-
 
 class Net(nn.Module):
 
-    def __init__(self, random_seed=dt.datetime.now().microsecond, compute_grad=True):
+    def __init__(self,
+                 random_seed=dt.datetime.now().microsecond,
+                 compute_grad=True):
         print("initializing \"Net\"")
         super(Net, self).__init__()
         self.rng = np.random.RandomState(random_seed)
 
         self.batch_size = cfg.CONST.BATCH_SIZE
-        
+
         self.img_w = cfg.CONST.IMG_W
         self.img_h = cfg.CONST.IMG_H
         self.n_vox = cfg.CONST.N_VOX
@@ -33,7 +32,7 @@ class Net(nn.Module):
         #initialize all the parameters of the gru net
         if hasattr(self, "encoder") and hasattr(self, "decoder"):
             for m in self.modules():
-                
+
                 if isinstance(m, (nn.Conv2d, nn.Conv3d)):
                     """
                     For Conv2d, the shape of the weight is 
@@ -45,7 +44,7 @@ class Net(nn.Module):
                     m.weight.data = weight_init(w_shape)
                     if m.bias is not None:
                         m.bias.data.fill_(0.1)
-                        
+
                 elif isinstance(m, nn.Linear):
                     """
                     For Linear module, the shape of the weight is (out_features, in_features)
@@ -55,7 +54,9 @@ class Net(nn.Module):
                     if m.bias is not None:
                         m.bias.data.fill_(0.1)
         else:
-            raise Exception("The network must have an encoder and a decoder before initializing all the parameters")
-                
+            raise Exception(
+                "The network must have an encoder and a decoder before initializing all the parameters"
+            )
+
     def forward(self, x, y=None):
         raise NotImplementedError("Define a forward pass")
