@@ -82,9 +82,10 @@ class TDR2N2Detector(object):
 
 
 def demo():
+    model_file_path = "/home/chli/chLi/3D-R2N2/checkpoint.pth"
     save_obj_file_path = "./prediction.obj"
 
-    td_r2n2_detector = TDR2N2Detector('/home/chli/chLi/3D-R2N2/checkpoint.pth')
+    td_r2n2_detector = TDR2N2Detector(model_file_path)
 
     image_file_path_list = []
     for i in range(3):
