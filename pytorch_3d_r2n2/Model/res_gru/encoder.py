@@ -12,7 +12,6 @@ from pytorch_3d_r2n2.Model.layers import FCConv3DLayer_torch
 class Encoder(nn.Module):
     def __init__(self, input_shape, n_convfilter, \
                  n_fc_filters, h_shape, conv3d_filter_shape):
-        print("\ninitializing \"Encoder\"")
         #  input_shape = (self.batch_size, 3, img_w, img_h)
         super(Encoder, self).__init__()
         #conv1

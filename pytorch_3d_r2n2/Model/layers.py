@@ -11,7 +11,6 @@ from pytorch_3d_r2n2.Config.config import cfg
 class FCConv3DLayer_torch(nn.Module):
 
     def __init__(self, fc_w_fan_in, filter_shape, output_shape):
-        print("initializing \"FCConv3DLayer_torch\"")
         super(FCConv3DLayer_torch, self).__init__()
         self.output_shape = output_shape
 
@@ -45,7 +44,6 @@ class FCConv3DLayer_torch(nn.Module):
 class BN_FCConv3DLayer_torch(nn.Module):
 
     def __init__(self, fc_w_fan_in, filter_shape, output_shape):
-        print("initializing \"FCConv3DLayer_torch\"")
         super(BN_FCConv3DLayer_torch, self).__init__()
         self.output_shape = output_shape
 
@@ -92,7 +90,6 @@ class BN_FCConv3DLayer_torch(nn.Module):
 class Unpool3DLayer(nn.Module):
 
     def __init__(self, unpool_size=2, padding=0):
-        print("initializing \"Unpool3DLayer\"")
         super(Unpool3DLayer, self).__init__()
         self.unpool_size = unpool_size
         self.padding = padding
@@ -117,37 +114,6 @@ class Unpool3DLayer(nn.Module):
             p : p + output_size[3] + 1 : n, \
             p : p + output_size[4] + 1 : n] = x
         return out
-
-
-class SoftmaxWithLoss3D(nn.Module):
-
-    def __init__(self):
-        super(SoftmaxWithLoss3D, self).__init__()
-        return
-
-    def forward(self, data):
-
-        if data['inputs']['test'] == False and data['inputs']['y'] is None:
-            raise Exception(
-                "'y is None' and 'test is False' cannot happen at the same time"
-            )
-        #the size of inputs and y is (batch_size, channels, depth, height, width)
-        #torch.max return a tuple of (max_value, index_of_max_value)
-        max_channel = torch.max(data['predictions']['out'],
-                                dim=1,
-                                keepdim=True)[0]
-        adj_inputs = data['predictions']['out'] - max_channel
-
-        exp_x = torch.exp(adj_inputs)
-        sum_exp_x = torch.sum(exp_x, dim=1, keepdim=True)
-        data['predictions']['prediction'] = exp_x / sum_exp_x
-
-        #if the ground truth is provided the loss will be computed
-        if data['inputs']['y'] is not None:
-            data['losses']['loss'] = torch.mean(
-                torch.sum(-data['inputs']['y'] * adj_inputs, dim = 1, keepdim = True) + \
-                torch.log(sum_exp_x))
-        return data
 
 
 class Recurrent_BatchNorm3d(nn.Module):

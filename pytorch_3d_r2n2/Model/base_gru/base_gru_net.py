@@ -9,8 +9,6 @@ from torch.autograd import Variable
 
 from pytorch_3d_r2n2.Config.config import cfg
 
-from pytorch_3d_r2n2.Model.layers import SoftmaxWithLoss3D
-
 from pytorch_3d_r2n2.Method.utils import weight_init
 
 
@@ -46,9 +44,6 @@ class BaseGRUNet(nn.Module):
         #the filter shape of the 3d convolutional gru unit
         self.conv3d_filter_shape = (self.n_deconvfilter[0],
                                     self.n_deconvfilter[0], 3, 3, 3)
-
-        #set the last layer
-        self.SoftmaxWithLoss3D = SoftmaxWithLoss3D()
         return
 
     def parameter_init(self):
@@ -82,9 +77,7 @@ class BaseGRUNet(nn.Module):
             )
 
     def initHidden(self, h_shape):
-        h = torch.zeros(h_shape)
-        if torch.cuda.is_available():
-            h = h.cuda()
+        h = torch.zeros(h_shape).cuda()
         return Variable(h)
 
     def forward(self, data):
@@ -93,17 +86,43 @@ class BaseGRUNet(nn.Module):
         u = self.initHidden(self.h_shape)
 
         # store intermediate update gate activations
-        u_list = []
+        data['predictions']['activations'] = []
 
         for time in range(data['inputs']['images'].size(0)):
-            gru_out, update_gate = self.encoder(data['inputs']['images'][time], h, u, time)
+            gru_out, update_gate = self.encoder(data['inputs']['images'][time],
+                                                h, u, time)
 
             h = gru_out
             u = update_gate
-            u_list.append(u)
+            data['predictions']['activations'].append(u)
 
-        data['predictions']['out'] = self.decoder(h)
-        data = self.SoftmaxWithLoss3D(data)
-        print(self.training)
-        data['predictions']['activations'] = u_list
+        data['predictions']['decoder_out'] = self.decoder(h)
+
+        max_channel = torch.max(data['predictions']['decoder_out'],
+                                dim=1,
+                                keepdim=True)[0]
+        data['predictions'][
+            'adj_inputs'] = data['predictions']['decoder_out'] - max_channel
+
+        exp_x = torch.exp(data['predictions']['adj_inputs'])
+        data['predictions']['sum_exp_x'] = torch.sum(exp_x,
+                                                     dim=1,
+                                                     keepdim=True)
+        data['predictions'][
+            'prediction'] = exp_x / data['predictions']['sum_exp_x']
+
+        if self.training:
+            data = self.loss(data)
+        return data
+
+    def loss(self, data):
+        #the size of images and voxels is (batch_size, channels, depth, height, width)
+        #torch.max return a tuple of (max_value, index_of_max_value)
+        assert data['inputs']['voxels'] is not None
+        data['losses']['loss'] = torch.mean(
+            torch.sum(-data['inputs']['voxels'] *
+                      data['predictions']['adj_inputs'],
+                      dim=1,
+                      keepdim=True) +
+            torch.log(data['predictions']['sum_exp_x']))
         return data

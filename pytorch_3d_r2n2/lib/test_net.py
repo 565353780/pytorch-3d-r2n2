@@ -66,8 +66,18 @@ def test_net():
         if batch_idx == num_batch:
             break
 
+        data = {
+            'inputs': {},
+            'predictions': {},
+            'losses': {},
+            'logs': {}
+        }
+
+        data['inputs']['images'] = batch_img
+        data['inputs']['voxels'] = batch_voxel
+
         #activations is a list of torch.cuda.FloatTensor
-        pred, loss, activations = solver.test_output(batch_img, batch_voxel)
+        pred, loss, activations = solver.detect(data)
 
         #convert pytorch tensor to numpy array
         pred = pred.detach().cpu().numpy()

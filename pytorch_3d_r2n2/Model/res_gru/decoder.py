@@ -10,7 +10,6 @@ from pytorch_3d_r2n2.Model.layers import Unpool3DLayer
 class Decoder(nn.Module):
 
     def __init__(self, n_deconvfilter, h_shape):
-        print("\ninitializing \"Decoder\"")
         super(Decoder, self).__init__()
         #3d conv7
         self.conv7a = Conv3d(n_deconvfilter[0],

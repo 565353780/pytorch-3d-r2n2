@@ -3,7 +3,6 @@
 
 from torch.utils.data import DataLoader
 
-
 from pytorch_3d_r2n2.Config.config import cfg
 
 from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
@@ -13,6 +12,7 @@ from pytorch_3d_r2n2.Dataset.dataset import ShapeNetDataset, ShapeNetCollateFn
 #  from pytorch_3d_r2n2.Method.process import kill_processes
 
 from pytorch_3d_r2n2.Module.trainer import Trainer
+
 
 def cleanup_handle(func):
     '''Cleanup the data processes before exiting the program'''

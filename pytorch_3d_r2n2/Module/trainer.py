@@ -11,8 +11,6 @@ from torch.optim import SGD, Adam, lr_scheduler
 
 from pytorch_3d_r2n2.Config.config import cfg
 
-from pytorch_3d_r2n2.Data.timer import Timer
-
 from pytorch_3d_r2n2.Method.augment import preprocess_img
 from pytorch_3d_r2n2.Method.utils import has_nan, max_or_nan
 
@@ -22,10 +20,9 @@ class Trainer(object):
     def __init__(self, net):
         self.net = net
         self.lr = cfg.TRAIN.DEFAULT_LEARNING_RATE
-        print('Set the learning rate to %f.' % self.lr)
 
-        #set the optimizer
         self.set_optimizer(cfg.TRAIN.POLICY)
+        return
 
     def set_optimizer(self, policy=cfg.TRAIN.POLICY):
         """
@@ -48,26 +45,19 @@ class Trainer(object):
             sys.exit('Error: Unimplemented optimization policy')
 
     def train_loss(self, x, y):
-        """
-        y is provided and test is False, only the loss will be returned.
+        data = {'inputs': {}, 'predictions': {}, 'losses': {}, 'logs': {}}
 
-        Args:
-            x (torch.Tensor): batch_img_tensor
-            y (torch.Tensor): batch_voxel_tensor
-        """
+        data['inputs']['images'] = x.cuda()
+        data['inputs']['voxels'] = y.cuda()
 
-        if torch.cuda.is_available():
-            x = x.cuda()
-            y = y.cuda()
-
-        loss = self.net(x, y, test=False)
+        data = self.net(data)
 
         #compute gradient and do parameter update step
         self.optimizer.zero_grad()
-        loss.backward()
+        data['losses']['loss'].backward()
         self.optimizer.step()
 
-        return loss
+        return data['losses']['loss']
 
     def train(self, train_loader, val_loader=None):
         ''' Given data queues, train the network '''
@@ -77,8 +67,6 @@ class Trainer(object):
             os.makedirs(save_dir)
 
         # Timer for the training op and parallel data loading op.
-        train_timer = Timer()
-        data_timer = Timer()
         training_losses = []
 
         # Setup learning rates
@@ -100,22 +88,17 @@ class Trainer(object):
         for train_ind in range(start_iter, cfg.TRAIN.NUM_ITERATION + 1):
             self.lr_scheduler.step()
 
-            data_timer.tic()
             try:
                 batch_img, batch_voxel = train_loader_iter.next()
             except StopIteration:
                 train_loader_iter = iter(train_loader)
                 batch_img, batch_voxel = train_loader_iter.next()
 
-            data_timer.toc()
-
             if self.net.is_x_tensor4:
                 batch_img = batch_img[0]
 
             # Apply one gradient step
-            train_timer.tic()
             loss = self.train_loss(batch_img, batch_voxel)
-            train_timer.toc()
 
             training_losses.append(loss.item())
 
@@ -205,12 +188,12 @@ class Trainer(object):
         else:
             raise Exception("no checkpoint found at '{}'".format(filename))
 
+    def detect(self, data):
+        data = self.net(data)
+        return data
+
     def detectImageFiles(self, image_file_path_list):
-        data = {
-            'inputs': {},
-            'predictions': {},
-            'losses': {},
-        }
+        data = {'inputs': {}, 'predictions': {}, 'losses': {}, 'logs': {}}
 
         img_h = cfg.CONST.IMG_H
         img_w = cfg.CONST.IMG_W
@@ -225,11 +208,11 @@ class Trainer(object):
 
         image_array = np.array(image_list, dtype=np.float32)
         data['inputs']['images'] = torch.from_numpy(image_array).cuda()
-        data['inputs']['y'] = None
-        data['inputs']['test'] = True
+        data['inputs']['voxels'] = None
 
         data = self.net(data)
         return data
+
 
 def demo():
     return True
