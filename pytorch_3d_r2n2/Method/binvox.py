@@ -136,58 +136,6 @@ def sparse_to_dense(voxel_data, dims, dtype=np.bool):
 # """
 # return x*(dims[1]*dims[2]) + z*dims[1] + y
 
-
-def write(voxel_model, fp):
-    """ Write binary binvox format.
-
-    Note that when saving a model in sparse (coordinate) format, it is first
-    converted to dense format.
-
-    Doesn't check if the model is 'sane'.
-
-    """
-    if voxel_model.data.ndim == 2:
-        # TODO avoid conversion to dense
-        dense_voxel_data = sparse_to_dense(voxel_model.data, voxel_model.dims)
-    else:
-        dense_voxel_data = voxel_model.data
-
-    fp.write('#binvox 1\n')
-    fp.write('dim ' + ' '.join(map(str, voxel_model.dims)) + '\n')
-    fp.write('translate ' + ' '.join(map(str, voxel_model.translate)) + '\n')
-    fp.write('scale ' + str(voxel_model.scale) + '\n')
-    fp.write('data\n')
-    if voxel_model.axis_order not in ('xzy', 'xyz'):
-        raise ValueError('Unsupported voxel model axis order')
-
-    if voxel_model.axis_order == 'xzy':
-        voxels_flat = dense_voxel_data.flatten()
-    elif voxel_model.axis_order == 'xyz':
-        voxels_flat = np.transpose(dense_voxel_data, (0, 2, 1)).flatten()
-
-    # keep a sort of state machine for writing run length encoding
-    state = voxels_flat[0]
-    ctr = 0
-    for c in voxels_flat:
-        if c == state:
-            ctr += 1
-            # if ctr hits max, dump
-            if ctr == 255:
-                fp.write(chr(state))
-                fp.write(chr(ctr))
-                ctr = 0
-        else:
-            # if switch state, dump
-            fp.write(chr(state))
-            fp.write(chr(ctr))
-            state = c
-            ctr = 1
-    # flush out remainders
-    if ctr > 0:
-        fp.write(chr(state))
-        fp.write(chr(ctr))
-
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
