@@ -6,11 +6,11 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 
-from pytorch_3d_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg
 
-from pytorch_3d_r2n2.Method.binvox import read_as_3d_array
-from pytorch_3d_r2n2.Method.augment import preprocess_img
-from pytorch_3d_r2n2.Method.io import category_model_id_pair, get_voxel_file, get_rendering_file
+from td_r2n2.Method.binvox import read_as_3d_array
+from td_r2n2.Method.augment import preprocess_img
+from td_r2n2.Method.io import category_model_id_pair, get_voxel_file, get_rendering_file
 
 
 class ShapeNetDataset(Dataset):

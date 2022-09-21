@@ -7,9 +7,9 @@ import datetime as dt
 import torch.nn as nn
 from torch.autograd import Variable
 
-from pytorch_3d_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg
 
-from pytorch_3d_r2n2.Method.utils import weight_init
+from td_r2n2.Method.utils import weight_init
 
 
 class BaseGRUNet(nn.Module):
@@ -96,6 +96,7 @@ class BaseGRUNet(nn.Module):
             u = update_gate
             data['predictions']['activations'].append(u)
 
+        data['predictions']['3d_r2n2_shape_code'] = h
         data['predictions']['decoder_out'] = self.decoder(h)
 
         max_channel = torch.max(data['predictions']['decoder_out'],

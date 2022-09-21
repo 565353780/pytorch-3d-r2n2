@@ -10,13 +10,13 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from pytorch_3d_r2n2.Config.config import cfg
-from pytorch_3d_r2n2.Dataset.dataset import ShapeNetCollateFn, ShapeNetDataset
-from pytorch_3d_r2n2.Method.time import getCurrentTimeStr
-from pytorch_3d_r2n2.Method.utils import has_nan, max_or_nan
-from pytorch_3d_r2n2.Module.td_r2n2_detector import TDR2N2Detector
+from td_r2n2.Config.config import cfg
+from td_r2n2.Dataset.dataset import ShapeNetCollateFn, ShapeNetDataset
+from td_r2n2.Method.time import getCurrentTimeStr
+from td_r2n2.Method.utils import has_nan, max_or_nan
+from td_r2n2.Module.detector import TDR2N2Detector
 
-#  from pytorch_3d_r2n2.Method.process import kill_processes
+#  from td_r2n2.Method.process import kill_processes
 
 
 class TDR2N2Trainer(TDR2N2Detector):

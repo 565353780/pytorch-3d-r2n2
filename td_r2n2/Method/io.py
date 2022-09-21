@@ -5,7 +5,7 @@ import os
 import json
 from collections import OrderedDict
 
-from pytorch_3d_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg
 
 
 def id_to_name(id, category_list):

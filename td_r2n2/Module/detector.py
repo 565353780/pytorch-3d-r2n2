@@ -6,13 +6,13 @@ import torch
 import numpy as np
 from PIL import Image
 
-from pytorch_3d_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg, cfg_from_list
 
-from pytorch_3d_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
+from td_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
 
-from pytorch_3d_r2n2.Method.path import createFileFolder
-from pytorch_3d_r2n2.Method.augment import preprocess_img
-from pytorch_3d_r2n2.Method.voxel import voxel2obj
+from td_r2n2.Method.path import createFileFolder
+from td_r2n2.Method.augment import preprocess_img
+from td_r2n2.Method.voxel import voxel2obj
 
 
 class TDR2N2Detector(object):
@@ -85,9 +85,11 @@ def demo():
     #  model_file_path = "./output/models/checkpoint.pth"
 
     #  image_folder_path = "./images/"
-    image_folder_path = "/home/chli/chLi/3D-R2N2/test_images/ustc_niu/white/"
+    image_folder_path = "/home/chli/chLi/3D-R2N2/test_images/screen/white/"
 
-    save_obj_file_path = "/home/chli/chLi/3D-R2N2/test_images/ustc_niu/predictions.obj"
+    save_obj_file_path = "/home/chli/chLi/3D-R2N2/test_images/screen/screen.obj"
+
+    cfg_from_list(['CONST.BATCH_SIZE', 1])
 
     td_r2n2_detector = TDR2N2Detector(model_file_path)
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pytorch_3d_r2n2.Model.base_gru.base_gru_net import BaseGRUNet
-from pytorch_3d_r2n2.Model.res_gru_bn.encoder import Encoder
-from pytorch_3d_r2n2.Model.res_gru_bn.decoder import Decoder
+from td_r2n2.Model.base_gru.base_gru_net import BaseGRUNet
+from td_r2n2.Model.res_gru_bn.encoder import Encoder
+from td_r2n2.Model.res_gru_bn.decoder import Decoder
 
 class ResidualGRUNet(BaseGRUNet):
 

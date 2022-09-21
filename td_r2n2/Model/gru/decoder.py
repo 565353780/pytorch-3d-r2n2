@@ -4,7 +4,7 @@
 import torch.nn as nn
 from torch.nn import LeakyReLU, Conv3d
 
-from pytorch_3d_r2n2.Model.layers import Unpool3DLayer
+from td_r2n2.Model.layers import Unpool3DLayer
 
 
 class decoder(nn.Module):

@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from pytorch_3d_r2n2.Data.voxels import Voxels
+from td_r2n2.Data.voxels import Voxels
 
 
 def read_header(fp):

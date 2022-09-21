@@ -5,7 +5,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 
-from pytorch_3d_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg
 
 
 class FCConv3DLayer_torch(nn.Module):

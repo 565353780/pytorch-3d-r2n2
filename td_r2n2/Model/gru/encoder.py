@@ -1,45 +1,61 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import torch.nn as nn
+import numpy as np
 from torch.nn import \
     Linear, Conv2d, MaxPool2d, LeakyReLU, Tanh, Sigmoid
 
-from pytorch_3d_r2n2.Model.layers import FCConv3DLayer_torch
+from td_r2n2.Model.layers import FCConv3DLayer_torch
 
 
 class Encoder(nn.Module):
     def __init__(self, input_shape, n_convfilter, \
                  n_fc_filters, h_shape, conv3d_filter_shape):
-        #  input_shape = (self.batch_size, 3, img_w, img_h)
+        print("initializing \"Encoder\"")
+        #input_shape = (self.batch_size, 3, img_w, img_h)
         super(Encoder, self).__init__()
         #conv1
-        self.conv1a = Conv2d(input_shape[1], n_convfilter[0], 7, padding=3)
-        self.conv1b = Conv2d(n_convfilter[0], n_convfilter[0], 3, padding=1)
+        conv1_kernal_size = 7
+        self.conv1 = Conv2d(in_channels= input_shape[1], \
+                            out_channels= n_convfilter[0], \
+                            kernel_size= conv1_kernal_size, \
+                            padding = int((conv1_kernal_size - 1) / 2))
 
         #conv2
-        self.conv2a = Conv2d(n_convfilter[0], n_convfilter[1], 3, padding=1)
-        self.conv2b = Conv2d(n_convfilter[1], n_convfilter[1], 3, padding=1)
-        self.conv2c = Conv2d(n_convfilter[0], n_convfilter[1], 1)
+        conv2_kernal_size = 3
+        self.conv2 = Conv2d(in_channels= n_convfilter[0], \
+                            out_channels= n_convfilter[1], \
+                            kernel_size= conv2_kernal_size,\
+                            padding = int((conv2_kernal_size - 1) / 2))
 
         #conv3
-        self.conv3a = Conv2d(n_convfilter[1], n_convfilter[2], 3, padding=1)
-        self.conv3b = Conv2d(n_convfilter[2], n_convfilter[2], 3, padding=1)
-        self.conv3c = Conv2d(n_convfilter[1], n_convfilter[2], 1)
+        conv3_kernal_size = 3
+        self.conv3 = Conv2d(in_channels= n_convfilter[1], \
+                            out_channels= n_convfilter[2], \
+                            kernel_size= conv2_kernal_size,\
+                            padding = int((conv3_kernal_size - 1) / 2))
 
         #conv4
-        self.conv4a = Conv2d(n_convfilter[2], n_convfilter[3], 3, padding=1)
-        self.conv4b = Conv2d(n_convfilter[3], n_convfilter[3], 3, padding=1)
+        conv4_kernal_size = 3
+        self.conv4 = Conv2d(in_channels= n_convfilter[2], \
+                            out_channels= n_convfilter[3], \
+                            kernel_size= conv2_kernal_size,\
+                            padding = int((conv4_kernal_size - 1) / 2))
 
         #conv5
-        self.conv5a = Conv2d(n_convfilter[3], n_convfilter[4], 3, padding=1)
-        self.conv5b = Conv2d(n_convfilter[4], n_convfilter[4], 3, padding=1)
-        self.conv5c = Conv2d(n_convfilter[3], n_convfilter[4], 1)
+        conv5_kernal_size = 3
+        self.conv5 = Conv2d(in_channels= n_convfilter[3], \
+                            out_channels= n_convfilter[4], \
+                            kernel_size= conv2_kernal_size,\
+                            padding = int((conv5_kernal_size - 1) / 2))
 
         #conv6
-        self.conv6a = Conv2d(n_convfilter[4], n_convfilter[5], 3, padding=1)
-        self.conv6b = Conv2d(n_convfilter[5], n_convfilter[5], 3, padding=1)
+        conv6_kernal_size = 3
+        self.conv6 = Conv2d(in_channels= n_convfilter[4], \
+                            out_channels= n_convfilter[5], \
+                            kernel_size= conv2_kernal_size,\
+                            padding = int((conv6_kernal_size - 1) / 2))
 
         #pooling layer
         self.pool = MaxPool2d(kernel_size=2, padding=1)
@@ -64,58 +80,22 @@ class Encoder(nn.Module):
         self.t_x_rs = FCConv3DLayer_torch(n_fc_filters[0], conv3d_filter_shape,
                                           h_shape)
 
-    def forward(self, x, h, u, time):
+    def forward(self, x, h, u):
         """
         x is the input and the size of x is (batch_size, channels, heights, widths).
         h and u is the hidden state and activation of last time step respectively.
         This function defines the forward pass of the encoder of the network.
         """
-        conv1a = self.conv1a(x)
-        rect1a = self.leaky_relu(conv1a)
-        conv1b = self.conv1b(rect1a)
-        rect1 = self.leaky_relu(conv1b)
-        pool1 = self.pool(rect1)
+        input_to_rect6 = nn.Sequential(self.conv1, self.pool, self.leaky_relu, \
+                                         self.conv2, self.pool, self.leaky_relu, \
+                                         self.conv3, self.pool, self.leaky_relu, \
+                                         self.conv4, self.pool, self.leaky_relu, \
+                                         self.conv5, self.pool, self.leaky_relu, \
+                                         self.conv6, self.pool, self.leaky_relu)
+        rect6 = input_to_rect6(x)
+        rect6 = rect6.view(rect6.size(0), -1)
 
-        conv2a = self.conv2a(pool1)
-        rect2a = self.leaky_relu(conv2a)
-        conv2b = self.conv2b(rect2a)
-        rect2 = self.leaky_relu(conv2b)
-        conv2c = self.conv2c(pool1)
-        res2 = conv2c + rect2
-        pool2 = self.pool(res2)
-
-        conv3a = self.conv3a(pool2)
-        rect3a = self.leaky_relu(conv3a)
-        conv3b = self.conv3b(rect3a)
-        rect3 = self.leaky_relu(conv3b)
-        conv3c = self.conv3c(pool2)
-        res3 = conv3c + rect3
-        pool3 = self.pool(res3)
-
-        conv4a = self.conv4a(pool3)
-        rect4a = self.leaky_relu(conv4a)
-        conv4b = self.conv4b(rect4a)
-        rect4 = self.leaky_relu(conv4b)
-        pool4 = self.pool(rect4)
-
-        conv5a = self.conv5a(pool4)
-        rect5a = self.leaky_relu(conv5a)
-        conv5b = self.conv5b(rect5a)
-        rect5 = self.leaky_relu(conv5b)
-        conv5c = self.conv5c(pool4)
-        res5 = conv5c + rect5
-        pool5 = self.pool(res5)
-
-        conv6a = self.conv6a(pool5)
-        rect6a = self.leaky_relu(conv6a)
-        conv6b = self.conv6b(rect6a)
-        rect6 = self.leaky_relu(conv6b)
-        res6 = pool5 + rect6
-        pool6 = self.pool(res6)
-
-        pool6 = pool6.view(pool6.size(0), -1)
-
-        fc7 = self.fc7(pool6)
+        fc7 = self.fc7(rect6)
         rect7 = self.leaky_relu(fc7)
 
         t_x_s_update = self.t_x_s_update(rect7, h)
@@ -141,7 +121,7 @@ class Encoder(nn.Module):
         #infer the size of the input feature map of the fully connected layer
         fc7_feat_w = img_w
         fc7_feat_h = img_h
-        for i in range(num_pooling):
+        for _ in range(num_pooling):
             #image downsampled by pooling layers
             #w_out= np.floor((w_in+ 2*padding[0]- dilation[0]*(kernel_size[0]- 1)- 1)/stride[0]+ 1)
             fc7_feat_w = np.floor((fc7_feat_w + 2 * 1 - 1 * (2 - 1) - 1) / 2 +

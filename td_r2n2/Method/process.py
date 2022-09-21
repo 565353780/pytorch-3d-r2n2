@@ -11,11 +11,11 @@ from PIL import Image
 from six.moves import queue
 from multiprocessing import Process, Event
 
-from pytorch_3d_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg
 
-from pytorch_3d_r2n2.Method.binvox import read_as_3d_array
-from pytorch_3d_r2n2.Method.augment import preprocess_img
-from pytorch_3d_r2n2.Method.io import get_voxel_file, get_rendering_file
+from td_r2n2.Method.binvox import read_as_3d_array
+from td_r2n2.Method.augment import preprocess_img
+from td_r2n2.Method.io import get_voxel_file, get_rendering_file
 
 
 def print_error(func):
@@ -230,8 +230,8 @@ def get_while_running(data_process, data_queue, sleep_time=0):
 
 def test_process():
     from multiprocessing import Queue
-    from pytorch_3d_r2n2.Config.config import cfg
-    from pytorch_3d_r2n2.Method.io import category_model_id_pair
+    from td_r2n2.Config.config import cfg
+    from td_r2n2.Method.io import category_model_id_pair
 
     cfg.TRAIN.PAD_X = 10
     cfg.TRAIN.PAD_Y = 10
