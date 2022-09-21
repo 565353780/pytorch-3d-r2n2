@@ -18,7 +18,7 @@ from pytorch_3d_r2n2.Method.voxel import voxel2obj
 class TDR2N2Detector(object):
 
     def __init__(self, model_file_path=None):
-        self.model = ResidualGRUNet()
+        self.model = ResidualGRUNet().cuda()
         self.lr = cfg.TRAIN.DEFAULT_LEARNING_RATE
 
         self.checkpoint = None
@@ -33,7 +33,6 @@ class TDR2N2Detector(object):
             print("\t model_file not exist!")
             return False
 
-        self.model.cuda()
         self.model.eval()
 
         print("[INFO][TDR2N2Detector]")
@@ -83,13 +82,17 @@ class TDR2N2Detector(object):
 
 def demo():
     model_file_path = "/home/chli/chLi/3D-R2N2/checkpoint.pth"
+    #  model_file_path = "./output/models/checkpoint.pth"
+    #  image_folder_path = "./images/"
+    image_folder_path = "/home/chli/chLi/3D-R2N2/ustc_niu/white/"
     save_obj_file_path = "./prediction.obj"
 
     td_r2n2_detector = TDR2N2Detector(model_file_path)
 
     image_file_path_list = []
-    for i in range(3):
-        image_file_path = "./images/" + str(i) + ".png"
+    image_file_name_list = os.listdir(image_folder_path)
+    for image_file_name in image_file_name_list:
+        image_file_path = image_folder_path + image_file_name
         image_file_path_list.append(image_file_path)
     data = td_r2n2_detector.detectImageFiles(image_file_path_list)
     td_r2n2_detector.saveAsObj(data, save_obj_file_path)
