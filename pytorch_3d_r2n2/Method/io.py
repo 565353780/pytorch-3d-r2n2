@@ -31,7 +31,7 @@ def category_model_id_pair(dataset_portion=[]):
 
     cats = json.load(open(cfg.DATASET))
     cats = OrderedDict(sorted(cats.items(), key=lambda x: x[0]))
-    for k, cat in cats.items():  # load by categories
+    for _, cat in cats.items():  # load by categories
         model_path = os.path.join(cfg.DIR.SHAPENET_QUERY_PATH, cat['id'])
         # category = cat['name']
         models = model_names(model_path)
@@ -82,7 +82,7 @@ def category_model_id_dict(dataset_portion=[]):
 
     counter = 0
 
-    for k, cat in cats.items():  # load by categories
+    for _, cat in cats.items():  # load by categories
         model_path = os.path.join(cfg.DIR.SHAPENET_QUERY_PATH, cat['id'])
         # category = cat['name']
         models = model_names(model_path)
