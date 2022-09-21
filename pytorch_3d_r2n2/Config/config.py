@@ -6,7 +6,7 @@ from easydict import EasyDict as edict
 __C = edict()
 cfg = __C
 
-__C.DATASET = './experiments/dataset/shapenet_1000.json'  # yaml/json file that specifies a dataset (training/testing)
+__C.DATASET = './pytorch_3d_r2n2/experiments/dataset/shapenet_1000.json'  # yaml/json file that specifies a dataset (training/testing)
 __C.NET_NAME = 'res_gru_net'
 __C.PROFILE = False
 __C.QUEUE_SIZE = 15  # maximum number of minibatches that can be put in a data queue
@@ -19,7 +19,7 @@ CONST.IMG_W = 127
 CONST.IMG_H = 127
 CONST.N_VOX = 32
 CONST.N_VIEWS = 5
-CONST.BATCH_SIZE = 36
+CONST.BATCH_SIZE = 1
 CONST.NETWORK_CLASS = 'ResidualGRUNet'
 CONST.WEIGHTS = ''  # when set, load the weights from the file
 
@@ -40,7 +40,7 @@ TRAIN.INITIAL_ITERATION = 0  # when the training resumes, set the iteration numb
 TRAIN.USE_REAL_IMG = False
 TRAIN.DATASET_PORTION = [0, 0.8]
 
-TRAIN.NUM_WORKER = 5  # number of data workers
+TRAIN.NUM_WORKER = 4  # number of data workers
 TRAIN.NUM_ITERATION = 60000  # maximum number of training iterations
 TRAIN.WORKER_LIFESPAN = 100  # if use blender, kill a worker after some iteration to clear cache
 TRAIN.WORKER_CAPACITY = 1000  # if use OSG, load only limited number of models at a time
@@ -72,8 +72,8 @@ TRAIN.MOMENTUM = 0.90
 # (for cross entropy loss). Too high regularization will also hinder training.
 TRAIN.WEIGHT_DECAY = 0.00005
 TRAIN.LOSS_LIMIT = 2  # stop training if the loss exceeds the limit
-TRAIN.SAVE_FREQ = 10000  # weights will be overwritten every save_freq
-TRAIN.PRINT_FREQ = 40
+TRAIN.SAVE_FREQ = 200  # weights will be overwritten every save_freq
+TRAIN.PRINT_FREQ = 200
 
 __C.TRAIN = TRAIN
 
