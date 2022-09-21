@@ -83,9 +83,11 @@ class TDR2N2Detector(object):
 def demo():
     model_file_path = "/home/chli/chLi/3D-R2N2/checkpoint.pth"
     #  model_file_path = "./output/models/checkpoint.pth"
+
     #  image_folder_path = "./images/"
-    image_folder_path = "/home/chli/chLi/3D-R2N2/ustc_niu/white/"
-    save_obj_file_path = "./prediction.obj"
+    image_folder_path = "/home/chli/chLi/3D-R2N2/test_images/ustc_niu/white/"
+
+    save_obj_file_path = "/home/chli/chLi/3D-R2N2/test_images/ustc_niu/predictions.obj"
 
     td_r2n2_detector = TDR2N2Detector(model_file_path)
 
