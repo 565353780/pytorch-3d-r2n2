@@ -17,13 +17,14 @@ http://cvgl.stanford.edu/data2/ShapeNetVox32.tgz
 ## Install
 
 ```bash
+conda create -n 3dr2n2 python=3.8
+conda activate 3dr2n2
 ./setup.sh
 ```
 
 ## Run
 
 ```bash
-conda activate 3dr2n2
 python demo.py
 ```
 
