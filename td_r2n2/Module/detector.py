@@ -6,7 +6,7 @@ import torch
 import numpy as np
 from PIL import Image
 
-from td_r2n2.Config.config import cfg
+from td_r2n2.Config.config import cfg, cfg_from_list
 
 from td_r2n2.Model.res_gru.res_gru_net import ResidualGRUNet
 
@@ -18,6 +18,7 @@ from td_r2n2.Method.voxel import voxel2obj
 class TDR2N2Detector(object):
 
     def __init__(self, model_file_path=None):
+        cfg_from_list(['CONST.BATCH_SIZE', 1])
         self.model = ResidualGRUNet().cuda()
         self.lr = cfg.TRAIN.DEFAULT_LEARNING_RATE
 

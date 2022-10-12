@@ -3,8 +3,6 @@
 
 import os
 
-from td_r2n2.Config.config import cfg_from_list
-
 from td_r2n2.Module.detector import TDR2N2Detector
 
 
@@ -16,8 +14,6 @@ def demo():
     image_folder_path = "/home/chli/chLi/3D-R2N2/test_images/screen/white/"
 
     save_obj_file_path = "/home/chli/chLi/3D-R2N2/test_images/screen/screen.obj"
-
-    cfg_from_list(['CONST.BATCH_SIZE', 1])
 
     td_r2n2_detector = TDR2N2Detector(model_file_path)
 
