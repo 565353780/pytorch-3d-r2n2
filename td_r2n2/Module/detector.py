@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import cv2
 import torch
 import numpy as np
 from PIL import Image
@@ -49,6 +50,8 @@ class TDR2N2Detector(object):
 
         valid_image_list = []
         for image in image_list:
+            if isinstance(image, np.ndarray) or isinstance(image, list):
+                image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
             valid_image = image.resize((cfg.CONST.IMG_H, cfg.CONST.IMG_W),
                                        Image.ANTIALIAS)
             valid_image = preprocess_img(valid_image, train=False)
